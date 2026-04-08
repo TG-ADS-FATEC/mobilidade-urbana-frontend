@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mobilidade_urbana_app/features/onboarding/controllers/onboarding_controller.dart';
+import 'package:mobilidade_urbana_app/features/onboarding/presentation/controllers/onboarding_controller.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 
 class OnboardingTransportSelector extends StatelessWidget {

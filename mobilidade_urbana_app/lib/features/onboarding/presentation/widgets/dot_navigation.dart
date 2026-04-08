@@ -1,7 +1,7 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:mobilidade_urbana_app/features/onboarding/controllers/onboarding_controller.dart';
+import 'package:mobilidade_urbana_app/features/onboarding/presentation/controllers/onboarding_controller.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
 import 'package:mobilidade_urbana_app/utils/device/device_utility.dart';
