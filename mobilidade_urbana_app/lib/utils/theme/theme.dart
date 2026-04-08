@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mobilidade_urbana_app/utils/theme/custom_themes/text_theme.dart';
-import 'package:mobilidade_urbana_app/utils/theme/controllers/theme.controller.dart';
 
 class TAppTheme {
   TAppTheme._();
