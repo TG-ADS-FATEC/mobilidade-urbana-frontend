@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:mobilidade_urbana_app/features/onboarding/screens/onboarding.dart';
+import 'package:mobilidade_urbana_app/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 import 'package:mobilidade_urbana_app/utils/helpers/helper_functions.dart';
 
