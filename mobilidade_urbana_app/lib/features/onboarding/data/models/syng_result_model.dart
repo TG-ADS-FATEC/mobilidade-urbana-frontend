@@ -1,1 +1,6 @@
-enum SyncResult { created, alreadyExists, collision, failed }
+enum SyncResult {
+  created,
+  alreadyExists,
+  collision,
+  failed,
+}

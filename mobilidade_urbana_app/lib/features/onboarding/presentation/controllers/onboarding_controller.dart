@@ -1,12 +1,15 @@
+// presentation/controllers/onboarding_controller.dart
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mobilidade_urbana_app/features/onboarding/data/models/onboarding_model.dart';
-import 'package:mobilidade_urbana_app/features/onboarding/presentation/screens/success_screen.dart';
-import 'package:mobilidade_urbana_app/utils/device/device_register_service.dart';
-import 'package:mobilidade_urbana_app/utils/device/device_token_service.dart';
+import '../screens/success_screen.dart';
+import '../../data/repositories/onboarding_repository.dart';
 
 class OnBoardingController extends GetxController {
   static OnBoardingController get instance => Get.find();
+
+  final OnboardingRepository _repository;
+  OnBoardingController(this._repository);
 
   final pageController = PageController();
   final currentPageIndex = 0.obs;
@@ -20,16 +23,10 @@ class OnBoardingController extends GetxController {
   final slowWalkingPace = false.obs;
   final walkingDuration = 10.0.obs;
   final isShowingValidationSnackbar = false.obs;
-
   final isSaving = false.obs;
-  String _deviceToken = '';
 
-
-  @override
-  void onInit() async {
-    super.onInit();
-    _deviceToken = await DeviceTokenService.get();
-  }
+  // ← removido: _deviceToken e DeviceTokenService
+  // ← removido: onInit com DeviceTokenService.get()
 
   bool get canGoNext {
     switch (currentPageIndex.value) {
@@ -79,7 +76,7 @@ class OnBoardingController extends GetxController {
   void nextPage() {
     if (!canGoNext) { showValidationSnackbar(); return; }
     if (currentPageIndex.value == 2) {
-      _saveAndNavigate(); // ← NOVO
+      _saveAndNavigate();
     } else {
       pageController.animateToPage(
         currentPageIndex.value + 1,
@@ -92,24 +89,17 @@ class OnBoardingController extends GetxController {
   Future<void> _saveAndNavigate() async {
     isSaving.value = true;
 
-    final model = OnboardingModel(
-      deviceToken: _deviceToken,
-      transportPreferences: transportPreferences.entries
+    await _repository.savePreferences(
+      transports: transportPreferences.entries
           .where((e) => e.value)
           .map((e) => e.key)
           .toList(),
-      selectedRoutePreference: selectedRoutePreference.value,
-      slowWalkingPace: slowWalkingPace.value,
+      routePreference: selectedRoutePreference.value,
+      slowWalking: slowWalkingPace.value,
       walkingDuration: walkingDuration.value,
-      isCompleted: true,
     );
 
-
-
-    await OnboardingHiveService.save(model);
     Get.to(() => const OnboardingSuccessScreen());
-    await DeviceRegisterService.register();
-
     isSaving.value = false;
   }
 

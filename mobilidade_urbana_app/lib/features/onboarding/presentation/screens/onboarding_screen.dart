@@ -1,5 +1,6 @@
+// presentation/screens/onboarding_screen.dart
+
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/presentation/controllers/onboarding_controller.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/presentation/widgets/dot_navigation.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/presentation/widgets/next_button.dart';
@@ -10,14 +11,12 @@ import 'package:mobilidade_urbana_app/features/onboarding/presentation/widgets/t
 import 'package:mobilidade_urbana_app/features/onboarding/presentation/widgets/walking_options.dart';
 import 'package:mobilidade_urbana_app/utils/constants/onboarding_texts.dart';
 
-
-
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(OnBoardingController());
+    final controller = OnBoardingController.instance; 
 
     return Scaffold(
       body: Stack(
@@ -44,8 +43,6 @@ class OnboardingScreen extends StatelessWidget {
               ),
             ],
           ),
-
-          // const OnBoardingSkip(),
           const OnBoardingPrevious(),
           const OnBoardingDotNavigation(),
           const OnBoardingNextButton(),
@@ -54,9 +51,3 @@ class OnboardingScreen extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
-
