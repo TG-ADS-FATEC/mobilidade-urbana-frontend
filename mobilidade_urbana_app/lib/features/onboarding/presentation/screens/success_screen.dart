@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:mobilidade_urbana_app/navigation_menu.dart';
 
 class OnboardingSuccessScreen extends StatefulWidget {
   const OnboardingSuccessScreen({super.key});
@@ -22,7 +23,7 @@ class _OnboardingSuccessScreenState extends State<OnboardingSuccessScreen>
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        // Get.offAll(() => const HomeScreen());
+        Get.offAll(() => const NavigationMenu());
       }
     });
   }
