@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:mobilidade_urbana_app/utils/local_storage/hive_init.dart';
-import 'app.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+void main() {
+  runApp(const MainApp());
+}
 
-  await HiveInit.init(); 
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
 
-  runApp(const App());
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Text('Hello World!'),
+        ),
+      ),
+    );
+  }
 }
