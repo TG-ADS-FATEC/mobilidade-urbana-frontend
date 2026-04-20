@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   permission_handler: ^11.3.0
+  flutter_native_splash: ^2.4.7
 
   # State management & navigation (GetX unificado)
   get: ^4.7.3
