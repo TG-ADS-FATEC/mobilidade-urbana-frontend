@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mobilidade_urbana_app/utils/constants/text_sizes.dart';
+import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
+import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
+import 'package:mobilidade_urbana_app/utils/helpers/helper_functions.dart';
+import 'package:mobilidade_urbana_app/utils/shared/widgets/section_heading.dart';
+
 class ProfileStats extends StatelessWidget {
   final int traveledKm;
   final int totalPoints;
@@ -16,53 +20,50 @@ class ProfileStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Estatísticas',
-          style: TextStyle(
-            fontSize: TTextSizes.titleMedium,
-            fontWeight: FontWeight.w600,
+    return Padding(
+      padding: EdgeInsetsGeometry.symmetric(horizontal: TSizes.xs),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TSectionHeading(title: 'Minhas Estatísticas'),
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 2.5,
+            children: [
+              _StatCard(
+                icon: Icons.directions_bus_outlined,
+                iconColor: Colors.grey,
+                value: '$traveledKm',
+                label: 'Km viajados',
+              ),
+              _StatCard(
+                icon: Icons.star_rounded,
+                iconColor: const Color(0xFFFFCC00),
+                value: '$totalPoints',
+                label: 'Pontos ganhos',
+                highlighted: true,
+              ),
+              _StatCard(
+                icon: Icons.hiking_outlined,
+                iconColor: Colors.grey,
+                value: '$hikingKm',
+                label: 'Km caminhados',
+                smallValue: true,
+              ),
+              _StatCard(
+                icon: Icons.timelapse,
+                iconColor: Colors.grey,
+                value: '$tripsMade',
+                label: 'Viagens realizadas',
+              ),
+            ],
           ),
-        ),
-        GridView.count(
-          crossAxisCount: 2,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          childAspectRatio: 2.5,
-          children: [
-            _StatCard(
-              icon: Icons.directions_bus_outlined,
-              iconColor: Colors.grey,
-              value: '$traveledKm',
-              label: 'Km viajados',
-            ),
-            _StatCard(
-              icon: Icons.star_rounded,
-              iconColor: const Color(0xFFFFCC00),
-              value: '$totalPoints',
-              label: 'Pontos ganhos',
-              highlighted: true,
-            ),
-            _StatCard(
-              icon: Icons.hiking_outlined,
-              iconColor: Colors.grey,
-              value: '$hikingKm',
-              label: 'Km caminhados',
-              smallValue: true,
-            ),
-            _StatCard(
-              icon: Icons.timelapse,
-              iconColor: Colors.grey,
-              value: '$tripsMade',
-              label: 'Viagens realizadas',
-            ),
-          ],
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -87,10 +88,11 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = THelperFunctions.isDarkMode(context);
 
     return Container(
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        color: isDark ? TColors.darkBackground : TColors.background,
         borderRadius: BorderRadius.circular(16),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
