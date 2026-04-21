@@ -18,7 +18,7 @@ class NearbyVehicles extends StatelessWidget {
           padding: EdgeInsetsGeometry.symmetric(horizontal: TSizes.xs),
           child: Column(
             children: [
-              TSectionHeading(title: 'Nas proximidades', showActionButton: true),
+              TSectionHeading(title: 'Nas proximidades', showActionButton: true, buttonTitle: "Ver todos"),
               SizedBox(height: TSizes.spaceBtwItems),
             ]
           ),
