@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/profile_appbar.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/profile_info.dart';
+import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/profile_shortcuts.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/profile_statistics.dart';
-import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/settings_menu_tile.dart';
+
+
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
 import 'package:mobilidade_urbana_app/utils/helpers/helper_functions.dart';
 
@@ -27,7 +29,8 @@ class ProfileScreen extends StatelessWidget {
                   ProfileInfo(),
                   SizedBox(height: 40),
                   ProfileStats(traveledKm: 24, totalPoints: 240, hikingKm: 8, tripsMade: 8),
-                  TSettingsMenuTile(icon: Icons.download_outlined, title: 'Atualização disponível', subtitle: 'v1.2.2', onTap: () {}),
+                  SizedBox(height: TSizes.spaceBtwSections),
+                  ProfileShortcuts()
                 ],
               )
             ),
