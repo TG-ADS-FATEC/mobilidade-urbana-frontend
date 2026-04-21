@@ -3,6 +3,7 @@ import 'package:mobilidade_urbana_app/features/home/presentation/widgets/home_ap
 import 'package:mobilidade_urbana_app/features/home/presentation/widgets/nearby_vehicles.dart';
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
 import 'package:mobilidade_urbana_app/utils/helpers/helper_functions.dart';
+import 'package:mobilidade_urbana_app/utils/shared/widgets/search_container.dart';
 
 
 class HomeScreen extends StatelessWidget {
@@ -21,8 +22,10 @@ class HomeScreen extends StatelessWidget {
                 padding: EdgeInsetsGeometry.symmetric(horizontal: TSizes.xs, vertical: TSizes.sm),
                 child: Column(
                   children: [
+                    TSearchContainer(isDark: isDark, placeholder: 'Para onde você quer ir?'),
+                    SizedBox(height: TSizes.spaceBtwSections),
                     NearbyVehicles(),
-                    SizedBox(height: 40),
+
                   ],
                 )
             ),
@@ -32,6 +35,8 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
+
+
 
 
 
