@@ -5,6 +5,7 @@ class TColors {
 
   // Brand Colors
   static const Color primary = Color(0xFF4CAF50);
+  static const Color soothingLime = Color(0xFFD4FF73);
   static const Color secondary = Color(0xFF81C784);
   static const Color tertiary = Color(0xFF388E3C);
 
@@ -18,8 +19,8 @@ class TColors {
   static const Color darkGrey = Color(0xFF616161);
 
   // Background Colors
-  static const Color background = Color(0xFFFFFFFF);
-  static const Color surface = Color(0xFFF8F9FA);
+  static const Color background = Color(0xFFEEEEEE);
+  static const Color surface = Color(0xFFFFFFFF) ;
   static const Color surfaceVariant = Color(0xFFE7E7E7);
 
   // Text Colors
