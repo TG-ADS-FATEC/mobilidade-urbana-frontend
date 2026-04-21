@@ -18,7 +18,6 @@ class ProfileScreen extends StatelessWidget {
 
     return Scaffold(
       body: SingleChildScrollView(
-
         child: Column(
           children: [
             TProfileAppBar(isDark: isDark),

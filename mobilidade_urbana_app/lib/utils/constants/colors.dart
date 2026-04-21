@@ -19,8 +19,8 @@ class TColors {
   static const Color darkGrey = Color(0xFF616161);
 
   // Background Colors
-  static const Color background = Color(0xFFFFFFFF);
-  static const Color surface = Color(0xFFF8F9FA);
+  static const Color background = Color(0xFFEEEEEE);
+  static const Color surface = Color(0xFFFFFFFF) ;
   static const Color surfaceVariant = Color(0xFFE7E7E7);
 
   // Text Colors

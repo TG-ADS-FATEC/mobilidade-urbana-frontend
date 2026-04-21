@@ -92,7 +92,7 @@ class _StatCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? TColors.darkBackground : TColors.background,
+        color: isDark ? TColors.darkSurface : TColors.surface,
         borderRadius: BorderRadius.circular(16),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
