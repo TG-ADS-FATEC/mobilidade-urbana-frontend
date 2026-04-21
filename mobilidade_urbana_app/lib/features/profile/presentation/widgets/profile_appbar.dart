@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:mobilidade_urbana_app/utils/shared/widgets/notification_menu_icon/notification_menu_icon.dart';
+import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/edit_profile_icon.dart';
 import 'package:mobilidade_urbana_app/utils/shared/widgets/appbar.dart';
 
 class TProfileAppBar extends StatelessWidget {
@@ -16,7 +16,7 @@ class TProfileAppBar extends StatelessWidget {
     return TAppBar(
       title: Text("Perfil"),
       actions: [
-        TNotificationCounterIcon(isDark: isDark, onPressed: () {},)
+        TEditProfileIcon(isDark: isDark, onPressed: () {},)
       ],
     );
   }

@@ -6,6 +6,6 @@ class TImages {
 
 
   // -- Profile
-  static const String user = "assets/images/avatars/10.png";
+  static const String userAvatar = "assets/images/avatars/10.png";
   
 }

@@ -4,6 +4,7 @@ class TSizes {
   static const double md = 24.0;
   static const double lg = 32.0;
   static const double xl = 40.0;
+  static const double twoXl = 80.0;
 
 
   // Icon Sizes

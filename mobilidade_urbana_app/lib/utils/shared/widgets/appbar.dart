@@ -26,7 +26,7 @@ class TAppBar extends StatelessWidget implements PreferredSizeWidget{
   Widget build(BuildContext context) {
     final isDark = THelperFunctions.isDarkMode(context);
 
-    return Padding(padding: EdgeInsetsGeometry.symmetric(horizontal: TSizes.md),
+    return Padding(padding: EdgeInsetsGeometry.symmetric(horizontal: TSizes.xs),
       child: AppBar(
         automaticallyImplyActions: false,
         leading: showBackArrow
