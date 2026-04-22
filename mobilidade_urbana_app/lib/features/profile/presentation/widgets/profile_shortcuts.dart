@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:mobilidade_urbana_app/features/profile/presentation/screens/edit_profile_screen.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/settings_menu_tile.dart';
 import 'package:mobilidade_urbana_app/utils/shared/widgets/section_heading.dart';
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
@@ -19,7 +21,7 @@ class ProfileShortcuts extends StatelessWidget {
             TSectionHeading(title: 'Configurações'),
             SizedBox(height: TSizes.spaceBtwItems),
             ...[
-              TSettingsMenuTile(icon: Icons.manage_accounts_outlined, title: 'Editar perfil', subtitle: 'Altere suas informações', onTap: () {}),
+              TSettingsMenuTile(icon: Icons.manage_accounts_outlined, title: 'Editar perfil', subtitle: 'Altere suas informações', onTap: () =>  Get.to(() => const EditProfileScreen())),
               TSettingsMenuTile(icon: Icons.history_rounded, title: 'Minhas Atividades', subtitle: 'Acompanhe seu uso no app', onTap: () {}),
               TSettingsMenuTile(icon: Icons.edit_notifications_outlined, title: 'Notificações', subtitle: 'Controle avisos e alertas', onTap: () {}),
               TSettingsMenuTile(icon: Icons.support_agent_rounded, title: 'Suporte', subtitle: 'Fale com a gente', onTap: () {}),

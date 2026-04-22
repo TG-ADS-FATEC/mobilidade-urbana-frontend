@@ -1,5 +1,6 @@
-
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:mobilidade_urbana_app/features/profile/presentation/screens/edit_profile_screen.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/app_bar/edit_profile_icon.dart';
 import 'package:mobilidade_urbana_app/utils/shared/widgets/appbar.dart';
 
@@ -16,7 +17,7 @@ class TProfileAppBar extends StatelessWidget {
     return TAppBar(
       title: Text("Perfil"),
       actions: [
-        TEditProfileIcon(isDark: isDark, onPressed: () {},)
+        TEditProfileIcon(isDark: isDark, onPressed: () =>  Get.to(() => const EditProfileScreen())),
       ],
     );
   }
