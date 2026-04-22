@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobilidade_urbana_app/features/home/presentation/screens/home_screen.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/screens/profile_screen.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 import 'package:mobilidade_urbana_app/utils/helpers/helper_functions.dart';
@@ -38,5 +39,5 @@ class NavigationMenu extends StatelessWidget{
 class NavigationController extends GetxController{
   final Rx<int> selectIndex = 0.obs;
 
-  final screens = [Container(color: Colors.green), Container(color: Colors.blue), Container(color: Colors.red), ProfileScreen()];
+  final screens = [HomeScreen(), Container(color: Colors.blue), Container(color: Colors.red), ProfileScreen()];
 }

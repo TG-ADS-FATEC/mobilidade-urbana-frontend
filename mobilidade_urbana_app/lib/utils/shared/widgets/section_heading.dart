@@ -5,7 +5,7 @@ class TSectionHeading extends StatelessWidget{
     super.key,
     this.onPressed,
     this.textColor,
-    this.buttonTitle = "Ver tudo",
+    this.buttonTitle = "Ver mais",
     required this.title,
     this.showActionButton = false,
   });
@@ -22,7 +22,13 @@ class TSectionHeading extends StatelessWidget{
       children: [
         Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(color: textColor)),
         if(showActionButton)
-          TextButton(onPressed: onPressed, child: Text(buttonTitle, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: textColor)))
+          Row(
+            children: [
+              TextButton(onPressed: onPressed, child: Text(buttonTitle, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: textColor))),
+              Icon(Icons.keyboard_arrow_down, size: 16, color: textColor),
+            ]
+          )
+
       ],
     );
   }

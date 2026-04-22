@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/profile_appbar.dart';
+import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/app_bar/profile_appbar.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/profile_info.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/profile_shortcuts.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/profile_statistics.dart';
