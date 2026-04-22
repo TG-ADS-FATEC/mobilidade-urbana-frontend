@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
+import 'package:mobilidade_urbana_app/utils/helpers/helper_functions.dart';
 import 'package:mobilidade_urbana_app/utils/shared/widgets/appbar.dart';
 
 
-class NotificationScreen extends StatelessWidget {
-  const NotificationScreen({super.key});
+class EditProfileScreen extends StatelessWidget {
+  const EditProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +15,7 @@ class NotificationScreen extends StatelessWidget {
         child: Column(
           children: [
             TAppBar(
-              title: Text("Notificações"),
+              title: Text("Editar Perfil"),
               showBackArrow: true,
             ),
             Padding(

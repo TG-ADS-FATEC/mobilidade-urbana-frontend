@@ -27,7 +27,7 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   ProfileInfo(),
                   SizedBox(height: 40),
-                  ProfileStats(traveledKm: 24, totalPoints: 240, hikingKm: 8, tripsMade: 8),
+                  ProfileStats(traveledKm: 24, totalPoints: 240, hikingKm: 14, tripsMade: 8),
                   SizedBox(height: TSizes.spaceBtwSections),
                   ProfileShortcuts()
                 ],

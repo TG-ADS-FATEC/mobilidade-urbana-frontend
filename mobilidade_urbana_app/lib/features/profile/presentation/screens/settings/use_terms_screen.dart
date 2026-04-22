@@ -3,8 +3,8 @@ import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
 import 'package:mobilidade_urbana_app/utils/shared/widgets/appbar.dart';
 
 
-class NotificationScreen extends StatelessWidget {
-  const NotificationScreen({super.key});
+class UseTermsScreen extends StatelessWidget {
+  const UseTermsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class NotificationScreen extends StatelessWidget {
         child: Column(
           children: [
             TAppBar(
-              title: Text("Notificações"),
+              title: Text("Termos de uso"),
               showBackArrow: true,
             ),
             Padding(
