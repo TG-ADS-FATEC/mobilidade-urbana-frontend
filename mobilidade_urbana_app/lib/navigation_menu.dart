@@ -22,12 +22,27 @@ class NavigationMenu extends StatelessWidget{
           onDestinationSelected: (index) => controller.selectIndex.value = index,
           backgroundColor: isDarkMode ? TColors.darkBackground : TColors.light,
           indicatorColor: isDarkMode ? TColors.white.withValues(alpha: 0.1) : TColors.black.withValues(alpha: 0.1),
-          destinations: const [
-            NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-            NavigationDestination(icon: Icon(Icons.directions_bus), label: 'Ir'),
-            NavigationDestination(icon: Icon(Icons.merge), label: 'Linhas'),
-            NavigationDestination(icon: Icon(Icons.account_circle), label: 'Perfil'),
-
+          destinations: [
+            NavigationDestination(
+              icon: Icon(Icons.home_outlined),
+              selectedIcon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.directions_bus_outlined),
+              selectedIcon: Icon(Icons.directions_bus),
+              label: 'Ir',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.merge_outlined),
+              selectedIcon: Icon(Icons.merge),
+              label: 'Linhas',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.account_circle_outlined),
+              selectedIcon: Icon(Icons.account_circle),
+              label: 'Perfil',
+            ),
           ],
         ),
       ),
