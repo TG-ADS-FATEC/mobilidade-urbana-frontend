@@ -6,6 +6,7 @@ import 'package:mobilidade_urbana_app/features/profile/presentation/screens/sett
 import 'package:mobilidade_urbana_app/features/profile/presentation/screens/settings/privacy_screen.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/screens/settings/suport_screen.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/screens/settings/use_terms_screen.dart';
+import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/deletion/settings_menu_deletion_tile.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/settings_menu_tile.dart';
 import 'package:mobilidade_urbana_app/utils/shared/widgets/section_heading.dart';
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
@@ -39,7 +40,7 @@ class ProfileShortcuts extends StatelessWidget {
             ...[
               TSettingsMenuTile(icon: Icons.analytics_outlined, title: 'Permitir monitoramente', subtitle: 'Coleta para melhorias', onTap: () {}, trailing: Switch(value: true, onChanged: (value) {}),),
               TSettingsMenuTile(icon: Icons.insert_drive_file_outlined, title: 'Termos de Uso', subtitle: 'Acompanhe seu uso no app', onTap: () => Get.to(() => const UseTermsScreen())),
-              TSettingsMenuTile(icon: Icons.delete_outline, title: 'Excluir conta', subtitle: 'Apaga todos seus dados', onTap: () {}),
+              TSettingsMenuDeletionTile(icon: Icons.delete_outline, title: 'Excluir conta', subtitle: 'Apaga todos seus dados', onTap: () {}),
             ].expand((widget) => [widget, SizedBox(height: TSizes.spaceBtwItems)]),
           ],
         ),
