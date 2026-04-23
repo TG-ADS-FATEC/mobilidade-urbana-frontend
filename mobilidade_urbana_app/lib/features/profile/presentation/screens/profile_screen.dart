@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/profile_appbar.dart';
+import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/app_bar/profile_appbar.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/profile_info.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/profile_shortcuts.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/profile_statistics.dart';
@@ -27,7 +27,7 @@ class ProfileScreen extends StatelessWidget {
                 children: [
                   ProfileInfo(),
                   SizedBox(height: 40),
-                  ProfileStats(traveledKm: 24, totalPoints: 240, hikingKm: 8, tripsMade: 8),
+                  ProfileStats(traveledKm: 24, totalPoints: 240, hikingKm: 14, tripsMade: 8),
                   SizedBox(height: TSizes.spaceBtwSections),
                   ProfileShortcuts()
                 ],
