@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:mobilidade_urbana_app/utils/http/dio_client.dart';
+import 'package:mobilidade_urbana_app/core/network/dio_client.dart';
 import 'package:mobilidade_urbana_app/utils/device/device_token_service.dart';
 
 class DeviceRegisterService {

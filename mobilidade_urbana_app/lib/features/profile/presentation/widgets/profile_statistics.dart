@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mobilidade_urbana_app/core/widgets/section_heading.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
 import 'package:mobilidade_urbana_app/utils/helpers/helper_functions.dart';
-import 'package:mobilidade_urbana_app/utils/shared/widgets/section_heading.dart';
 
 class ProfileStats extends StatelessWidget {
   final int traveledKm;
