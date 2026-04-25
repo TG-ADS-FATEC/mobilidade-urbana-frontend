@@ -42,7 +42,7 @@ class ProfileShortcuts extends StatelessWidget {
             ...[
               TSettingsMenuTile(icon: Icons.analytics_outlined, title: 'Permitir monitoramente', subtitle: 'Coleta para melhorias', onTap: () {}, trailing: Switch(value: true, onChanged: (value) {}),),
               TSettingsMenuTile(icon: Icons.insert_drive_file_outlined, title: 'Termos de Uso', subtitle: 'Acompanhe seu uso no app', onTap: () => Get.to(() => const UseTermsScreen())),
-              TSettingsMenuDeletionTile(icon: Icons.delete_outline, title: 'Excluir conta', subtitle: 'Apaga todos seus dados', onTap: () => _confirmDelete(context)),
+              TSettingsMenuDeletionTile(icon: Icons.delete_outline, title: 'Excluir conta', subtitle: 'Apaga todos seus dados', onTap: () => controller.deleteProfile()),
             ].expand((widget) => [widget, SizedBox(height: TSizes.spaceBtwItems)]),
           ],
         ),

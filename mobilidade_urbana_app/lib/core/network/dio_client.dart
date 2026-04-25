@@ -10,7 +10,8 @@ class DioClient {
 
   static Dio _build() {
     final dio = Dio(BaseOptions(
-      baseUrl: dotenv.env['BASE_URL'] ?? 'http://localhost:8080',
+      // baseUrl: dotenv.env['BASE_URL'] ?? 'http://localhost:8080',
+      baseUrl: 'http://localhost:8080',
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
       headers: {'Content-Type': 'application/json'},

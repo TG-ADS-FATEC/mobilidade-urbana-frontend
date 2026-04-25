@@ -3,8 +3,6 @@ import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/app_
 import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/profile_info.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/profile_shortcuts.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/profile_statistics.dart';
-
-
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
 import 'package:mobilidade_urbana_app/utils/helpers/helper_functions.dart';
 
