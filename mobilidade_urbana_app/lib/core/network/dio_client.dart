@@ -1,13 +1,16 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mobilidade_urbana_app/utils/device/device_token_service.dart';
 
 class DioClient {
+  static const _publicRoutes = ['/devices'];
+
   static final Dio instance = _build();
 
   static Dio _build() {
     final dio = Dio(BaseOptions(
-      baseUrl: 'http://192.168.10.100:8080',
+      baseUrl: dotenv.env['BASE_URL'] ?? 'http://localhost:8080',
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
       headers: {'Content-Type': 'application/json'},
@@ -15,7 +18,7 @@ class DioClient {
 
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        final isPublic = options.path == '/devices';
+        final isPublic = _publicRoutes.contains(options.path);
 
         if (!isPublic) {
           final token = await DeviceTokenService.get();
@@ -23,9 +26,6 @@ class DioClient {
         }
 
         handler.next(options);
-      },
-      onResponse: (response, handler) {
-        handler.next(response);
       },
       onError: (DioException e, handler) {
         if (kDebugMode) {
