@@ -70,6 +70,7 @@ class AppBindings extends Bindings {
           () => ProfileController(
         Get.find<GetProfileUseCase>(),
         Get.find<UpdateProfileUseCase>(),
+        Get.find<DeleteProfileUseCase>(),
       ),
     );
   }
