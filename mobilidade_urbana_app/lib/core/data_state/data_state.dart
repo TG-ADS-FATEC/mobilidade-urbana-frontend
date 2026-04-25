@@ -1,3 +1,5 @@
+import 'package:mobilidade_urbana_app/core/error/failures.dart';
+
 sealed class DataState<T> {
   const DataState();
 }
@@ -8,7 +10,6 @@ final class DataSuccess<T> extends DataState<T> {
 }
 
 final class DataFailed<T> extends DataState<T> {
-  final Exception error;
-  final String? message;
-  const DataFailed(this.error, {this.message});
+  final AppFailure failure;
+  const DataFailed(this.failure);
 }
