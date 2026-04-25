@@ -4,6 +4,7 @@ import 'package:mobilidade_urbana_app/features/profile/data/models/profile_model
 
 abstract class ProfileRemoteDataSource {
   Future<ProfileModel> getProfile();
+  Future<ProfileModel> saveProfile(Map<String, dynamic> data);
   Future<ProfileModel> updateProfile(Map<String, dynamic> data);
   Future<void> deleteProfile();
 }
@@ -23,6 +24,12 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
     final response = await _dio.put('/profile', data: data);
     return ProfileModel.fromJson(response.data);
 
+  }
+
+  @override
+  Future<ProfileModel> saveProfile(Map<String, dynamic> data) async {
+    final response = await _dio.post('/profile', data: data);
+    return ProfileModel.fromJson(response.data);
   }
 
   @override

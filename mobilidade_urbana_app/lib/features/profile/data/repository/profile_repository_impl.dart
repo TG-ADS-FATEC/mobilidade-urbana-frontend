@@ -45,6 +45,24 @@ class ProfileRepositoryImpl implements ProfileRepository {
   }
 
   @override
+  Future<DataState<ProfileEntity>> saveProfile({
+    required ProfileEntity profile,
+  }) async {
+    try {
+      final model = await _remoteDataSource.updateProfile(
+        ProfileModel.fromEntity(profile).toJson(),
+      );
+      return DataSuccess(model);
+    } on DioException catch (e) {
+      return DataFailed(
+          e.type == DioExceptionType.connectionError
+              ? NetworkFailure()
+              : ServerFailure(e.message ?? 'Erro no servidor')
+      );
+    }
+  }
+
+  @override
   Future<DataState<void>> deleteProfile() async {
     try {
       await _remoteDataSource.deleteProfile();
