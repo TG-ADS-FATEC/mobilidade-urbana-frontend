@@ -4,9 +4,9 @@ import 'package:get/get.dart';
 import 'package:mobilidade_urbana_app/core/data_state/data_state.dart';
 import 'package:mobilidade_urbana_app/core/widgets/confirm_dialog.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/entities/profile.entity.dart';
-import 'package:mobilidade_urbana_app/features/profile/domain/usecases/delete_profile_usecase.dart';
-import 'package:mobilidade_urbana_app/features/profile/domain/usecases/get_profile_usecase.dart';
-import 'package:mobilidade_urbana_app/features/profile/domain/usecases/update_profile_usecase.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/usecases/profile/delete_profile_usecase.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/usecases/profile/get_profile_usecase.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/usecases/profile/update_profile_usecase.dart';
 
 class ProfileController extends GetxController {
   final GetProfileUseCase _getProfileUseCase;
