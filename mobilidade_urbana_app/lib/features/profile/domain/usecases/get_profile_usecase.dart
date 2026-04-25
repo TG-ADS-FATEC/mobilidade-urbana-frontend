@@ -7,7 +7,7 @@ class GetProfileUseCase {
 
   const GetProfileUseCase(this.repository);
 
-  Future<DataState<ProfileEntity>> call(String deviceToken) async {
-    return await repository.getProfile(deviceToken);
+  Future<DataState<ProfileEntity>> call() async {
+    return await repository.getProfile();
   }
 }

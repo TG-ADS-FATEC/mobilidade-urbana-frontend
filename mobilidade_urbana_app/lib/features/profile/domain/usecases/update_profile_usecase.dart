@@ -8,11 +8,9 @@ class UpdateProfileUseCase {
   const UpdateProfileUseCase(this.repository);
 
   Future<DataState<ProfileEntity>> call({
-    required String deviceToken,
     required ProfileEntity profile,
   }) async {
     return await repository.updateProfile(
-      deviceToken: deviceToken,
       profile: profile,
     );
   }
