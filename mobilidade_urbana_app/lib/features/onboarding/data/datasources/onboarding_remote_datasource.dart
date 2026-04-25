@@ -1,9 +1,10 @@
 
 import 'package:dio/dio.dart';
 import 'package:flutter/rendering.dart';
+import 'package:mobilidade_urbana_app/core/network/dio_client.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/data/models/onboarding_model.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/data/models/syng_result_model.dart';
-import 'package:mobilidade_urbana_app/utils/http/dio_client.dart';
+
 
 class OnboardingRemoteDatasource {
   final _dio = DioClient.instance;
