@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:mobilidade_urbana_app/core/widgets/search_container.dart';
 import 'package:mobilidade_urbana_app/features/home/presentation/widgets/home_appbart.dart';
 import 'package:mobilidade_urbana_app/features/home/presentation/widgets/nearby_vehicles.dart';
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
 import 'package:mobilidade_urbana_app/utils/helpers/helper_functions.dart';
-import 'package:mobilidade_urbana_app/utils/shared/widgets/search_container.dart';
 
 
 class HomeScreen extends StatelessWidget {

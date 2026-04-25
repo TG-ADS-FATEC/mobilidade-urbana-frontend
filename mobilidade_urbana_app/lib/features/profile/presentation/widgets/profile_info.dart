@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobilidade_urbana_app/utils/constants/image_strings.dart';
-import 'package:mobilidade_urbana_app/utils/shared/widgets/circular_Image.dart';
+import 'package:mobilidade_urbana_app/core/widgets/circular_Image.dart';
 import 'package:mobilidade_urbana_app/utils/constants/text_sizes.dart';
 
 class ProfileInfo extends StatelessWidget {

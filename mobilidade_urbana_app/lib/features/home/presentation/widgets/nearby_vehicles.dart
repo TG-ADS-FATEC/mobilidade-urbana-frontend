@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mobilidade_urbana_app/utils/constants/image_strings.dart';
+import 'package:mobilidade_urbana_app/core/widgets/section_heading.dart';
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
-import 'package:mobilidade_urbana_app/utils/shared/widgets/circular_Image.dart';
-import 'package:mobilidade_urbana_app/utils/constants/text_sizes.dart';
-import 'package:mobilidade_urbana_app/utils/shared/widgets/section_heading.dart';
+
 
 class NearbyVehicles extends StatelessWidget {
   const NearbyVehicles({
