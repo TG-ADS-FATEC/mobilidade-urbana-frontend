@@ -4,5 +4,6 @@ import 'package:mobilidade_urbana_app/features/profile/domain/entities/profile.e
 abstract class ProfileRepository {
   Future<DataState<ProfileEntity>> getProfile();
   Future<DataState<ProfileEntity>> updateProfile({required ProfileEntity profile});
+  Future<DataState<ProfileEntity>> saveProfile({required ProfileEntity profile});
   Future<DataState<void>> deleteProfile();
 }

@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobilidade_urbana_app/core/bindings/profile_binding.dart';
 import 'package:mobilidade_urbana_app/features/home/presentation/screens/home_screen.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/screens/profile_screen.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
@@ -55,7 +56,7 @@ class NavigationMenu extends StatelessWidget{
                 height: 80,
                 elevation: 0,
                 selectedIndex: controller.selectIndex.value,
-                onDestinationSelected: (index) => controller.selectIndex.value = index,
+                onDestinationSelected: (index) => controller.onTabChanged(index),
                 backgroundColor: isDarkMode ? TColors.darkBackground : TColors.light,
                 indicatorColor: isDarkMode
                     ? TColors.white.withValues(alpha: 0.1)
@@ -95,5 +96,29 @@ class NavigationMenu extends StatelessWidget{
 class NavigationController extends GetxController{
   final Rx<int> selectIndex = 0.obs;
 
-  final screens = [HomeScreen(), Container(color: Colors.blue), Container(color: Colors.red), ProfileScreen()];
+  final screens = [
+    HomeScreen(),
+    Container(color: Colors.blue),
+    Container(color: Colors.red),
+    ProfileScreen(),
+  ];
+
+  final bindings = [
+    null,
+    null,
+    null,
+    ProfileBinding(),
+  ];
+
+  @override
+  void onInit() {
+    super.onInit();
+    bindings[0]?.dependencies();
+  }
+
+  void onTabChanged(int index) {
+    bindings[index]?.dependencies();
+    selectIndex.value = index;
+  }
+
 }
