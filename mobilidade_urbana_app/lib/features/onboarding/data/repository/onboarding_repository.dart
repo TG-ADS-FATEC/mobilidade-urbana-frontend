@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/data/data_sources/onboarding_local_datasource.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/data/data_sources/onboarding_remote_datasource.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/data/models/onboarding_model.dart';
-import 'package:mobilidade_urbana_app/utils/device/device_token_service.dart';
+import 'package:mobilidade_urbana_app/core/services/device_token_service.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/data/models/syng_result_model.dart';
 
 

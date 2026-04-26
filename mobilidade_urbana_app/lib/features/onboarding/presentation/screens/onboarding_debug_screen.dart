@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mobilidade_urbana_app/core/services/device_token_service.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/data/data_sources/onboarding_local_datasource.dart';
-import 'package:mobilidade_urbana_app/utils/device/device_token_service.dart';
 
 class OnboardingDebugPage extends StatefulWidget {
   const OnboardingDebugPage({super.key});

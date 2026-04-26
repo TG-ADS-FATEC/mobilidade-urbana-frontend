@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import 'package:mobilidade_urbana_app/core/bindings/onboading_binding.dart';
 import 'package:mobilidade_urbana_app/core/router/app_router.dart';
-import 'package:mobilidade_urbana_app/features/onboarding/data/datasources/onboarding_local_datasource.dart';
+import 'package:mobilidade_urbana_app/features/onboarding/data/data_sources/onboarding_local_datasource.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:mobilidade_urbana_app/navigation_menu.dart';
 import 'package:mobilidade_urbana_app/utils/theme/theme.dart';

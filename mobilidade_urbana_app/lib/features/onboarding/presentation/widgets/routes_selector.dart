@@ -60,6 +60,7 @@ class OnboardingRouteSelector extends StatelessWidget {
                 vertical: 4,
               ),
             ),
+
           );
         }).toList(),
       ),

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:mobilidade_urbana_app/core/data_state/data_state.dart';
+import 'package:mobilidade_urbana_app/core/services/auth_service.dart';
 
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
 
@@ -40,6 +43,20 @@ class OnBoardingPageLayout1 extends StatelessWidget {
             const SizedBox(height: TSizes.spaceBtwSections),
             child!,
           ],
+          ElevatedButton(
+            onPressed: () async {
+              final result = await AuthService.authenticate();
+              switch (result) {
+                case DataSuccess<String>(:final data):
+                  debugPrint('[Auth] JWT: $data');
+                  Get.snackbar('Sucesso', 'JWT obtido!');
+                case DataFailed<String>(:final failure):
+                  debugPrint('[Auth] Falha: ${failure.message}');
+                  Get.snackbar('Erro', failure.message);
+              }
+            },
+            child: const Text('Testar Auth'),
+          ),
         ],
       ),
     );
