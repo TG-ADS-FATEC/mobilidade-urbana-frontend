@@ -22,10 +22,11 @@ class DioClient {
         final isPublic = _publicRoutes.contains(options.path);
 
         if (!isPublic) {
-          final token = await DeviceTokenService.get();
-          options.headers['X-Device-Token'] = token;
+          final jwt = await DeviceTokenService.getJwt();
+          if (jwt != null) {
+            options.headers['Authorization'] = 'Bearer $jwt';
+          }
         }
-
         handler.next(options);
       },
       onError: (DioException e, handler) {
