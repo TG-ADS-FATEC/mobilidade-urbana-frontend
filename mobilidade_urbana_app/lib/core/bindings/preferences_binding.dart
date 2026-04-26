@@ -8,7 +8,7 @@ import 'package:mobilidade_urbana_app/features/profile/domain/usecases/preferenc
 import 'package:mobilidade_urbana_app/features/profile/domain/usecases/preferences/update_preferences_usecase.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/controllers/preferences_controller.dart';
 
-class OnboadingBinding extends Bindings{
+class PreferencesBinding extends Bindings{
   @override
   void dependencies() {
 
