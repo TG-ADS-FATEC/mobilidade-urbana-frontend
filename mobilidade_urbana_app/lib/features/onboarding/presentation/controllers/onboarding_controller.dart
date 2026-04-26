@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobilidade_urbana_app/features/onboarding/data/repository/onboarding_repository.dart';
 import '../screens/success_screen.dart';
-import '../../data/repositories/onboarding_repository.dart';
 
 class OnBoardingController extends GetxController {
   static OnBoardingController get instance => Get.find();
