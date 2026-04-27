@@ -1,66 +1,48 @@
-// presentation/controllers/onboarding_controller.dart
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mobilidade_urbana_app/features/onboarding/data/repository/onboarding_repository.dart';
-import '../screens/success_screen.dart';
+import 'package:mobilidade_urbana_app/core/data_state/data_state.dart';
+import 'package:mobilidade_urbana_app/core/services/device_token_service.dart';
+import 'package:mobilidade_urbana_app/core/services/onboarding_service.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/entities/preferences.entity.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/usecases/preferences/save_preferences_usecase.dart';
 
 class OnBoardingController extends GetxController {
   static OnBoardingController get instance => Get.find();
 
-  final OnboardingRepository _repository;
-  OnBoardingController(this._repository);
+  final SavePreferencesUseCase _savePreferencesUseCase;
+  OnBoardingController(this._savePreferencesUseCase);
 
   final pageController = PageController();
   final currentPageIndex = 0.obs;
+  final isSaving = false.obs;
+  final isShowingValidationSnackbar = false.obs;
 
-  final selectedRoutePreference = 'Mais rápida'.obs;
-  final transportPreferences = <String, bool>{
-    'Ônibus': false,
-    'Trem': false,
-    'Metrô': false,
-  }.obs;
+  final selectedRoutePreference = RoutePreference.fastest.obs;
+  final selectedTransports = <TransportType>{}.obs;
   final slowWalkingPace = false.obs;
   final walkingDuration = 10.0.obs;
-  final isShowingValidationSnackbar = false.obs;
-  final isSaving = false.obs;
-
-  // ← removido: _deviceToken e DeviceTokenService
-  // ← removido: onInit com DeviceTokenService.get()
 
   bool get canGoNext {
     switch (currentPageIndex.value) {
-      case 0: return transportPreferences.values.any((v) => v);
-      case 1: return selectedRoutePreference.value.isNotEmpty;
+      case 0: return selectedTransports.isNotEmpty;
+      case 1: return true;
       case 2: return true;
       default: return false;
     }
   }
 
-  void updatePageIndicator(index) => currentPageIndex.value = index;
+  void updatePageIndicator(int index) => currentPageIndex.value = index;
 
-  void dotNavigationClick(index) {
+  void dotNavigationClick(int index) {
     currentPageIndex.value = index;
     pageController.jumpToPage(index);
   }
 
-  void toggleTransport(String transport, bool value) {
-    transportPreferences[transport] = value;
-    transportPreferences.refresh();
-  }
-
-  bool isTransportEnabled(String transport) =>
-      transportPreferences[transport] ?? false;
-
-  void updateRoutePreference(String value) =>
-      selectedRoutePreference.value = value;
-
-  void updateSlowWalkingPace(bool value) => slowWalkingPace.value = value;
-
-  void updateWalkingDuration(double value) => walkingDuration.value = value;
-
   void previousPage() {
-    if (currentPageIndex.value == 0) { Get.back(); return; }
+    if (currentPageIndex.value == 0) {
+      Get.back();
+      return;
+    }
     pageController.animateToPage(
       currentPageIndex.value - 1,
       duration: const Duration(milliseconds: 300),
@@ -68,13 +50,11 @@ class OnBoardingController extends GetxController {
     );
   }
 
-  void skipPage() {
-    currentPageIndex.value = 2;
-    pageController.jumpToPage(2);
-  }
-
   void nextPage() {
-    if (!canGoNext) { showValidationSnackbar(); return; }
+    if (!canGoNext) {
+      _showValidationSnackbar();
+      return;
+    }
     if (currentPageIndex.value == 2) {
       _saveAndNavigate();
     } else {
@@ -86,30 +66,73 @@ class OnBoardingController extends GetxController {
     }
   }
 
-  Future<void> _saveAndNavigate() async {
-    isSaving.value = true;
-
-    await _repository.savePreferences(
-      transports: transportPreferences.entries
-          .where((e) => e.value)
-          .map((e) => e.key)
-          .toList(),
-      routePreference: selectedRoutePreference.value,
-      slowWalking: slowWalkingPace.value,
-      walkingDuration: walkingDuration.value,
-    );
-
-    Get.to(() => const OnboardingSuccessScreen());
-    isSaving.value = false;
+  void skipPage() {
+    currentPageIndex.value = 2;
+    pageController.jumpToPage(2);
   }
 
-  void showValidationSnackbar() {
+  void toggleTransport(TransportType transport) {
+    if (selectedTransports.contains(transport)) {
+      selectedTransports.remove(transport);
+    } else {
+      selectedTransports.add(transport);
+    }
+  }
+
+  bool isTransportSelected(TransportType transport) =>
+      selectedTransports.contains(transport);
+
+  void updateRoutePreference(RoutePreference value) =>
+      selectedRoutePreference.value = value;
+
+  void updateSlowWalkingPace(bool value) => slowWalkingPace.value = value;
+
+  void updateWalkingDuration(double value) => walkingDuration.value = value;
+
+
+  Future<void> _saveAndNavigate() async {
+    isSaving.value = true;
+    final deviceToken = await DeviceTokenService.get();
+
+    final preferences = PreferencesEntity(
+      transportTypes: selectedTransports.toList(),
+      routePreference: selectedRoutePreference.value,
+      slowPace: slowWalkingPace.value,
+      maxWalkingTime: walkingDuration.value.toInt(),
+      updatedAt: DateTime.now(),
+      deviceToken: deviceToken,
+    );
+
+    final result = await _savePreferencesUseCase(preferences: preferences);
+
+    isSaving.value = false;
+
+    switch (result) {
+      case DataSuccess():
+        await OnboardingService.setComplete();
+        Get.offAllNamed('/onboarding-success');
+
+      case DataFailed():
+        Get.snackbar(
+          'Erro',
+          result.failure.message ?? 'Não foi possível salvar suas preferências',
+          snackPosition: SnackPosition.BOTTOM,
+          margin: const EdgeInsets.all(16),
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+    }
+  }
+
+  void _showValidationSnackbar() {
     if (isShowingValidationSnackbar.value) return;
     isShowingValidationSnackbar.value = true;
+
     final messages = {
       0: 'Selecione pelo menos um meio de transporte.',
       1: 'Selecione uma preferência de rota.',
     };
+
     Get.snackbar(
       'Atenção',
       messages[currentPageIndex.value] ??
@@ -118,8 +141,16 @@ class OnBoardingController extends GetxController {
       margin: const EdgeInsets.all(16),
       duration: const Duration(seconds: 2),
     );
-    Future.delayed(const Duration(seconds: 2), () {
-      isShowingValidationSnackbar.value = false;
-    });
+
+    Future.delayed(
+      const Duration(seconds: 2),
+          () => isShowingValidationSnackbar.value = false,
+    );
+  }
+
+  @override
+  void onClose() {
+    pageController.dispose();
+    super.onClose();
   }
 }
