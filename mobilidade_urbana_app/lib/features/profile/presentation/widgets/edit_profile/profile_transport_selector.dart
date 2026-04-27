@@ -13,9 +13,8 @@ class ProfileTransportSelector extends StatelessWidget {
 
     final transports = [
       (label: 'Ônibus', icon: Icons.directions_bus_outlined, type: TransportType.bus),
+      (label: 'Trem', icon: Icons.train_outlined, type: TransportType.train),
       (label: 'Metrô', icon: Icons.subway_outlined, type: TransportType.subway),
-      (label: 'Caminhada', icon: Icons.directions_walk_outlined, type: TransportType.walking),
-      (label: 'Bicicleta', icon: Icons.directions_bike_outlined, type: TransportType.cycling),
     ];
 
     return Obx(() {
