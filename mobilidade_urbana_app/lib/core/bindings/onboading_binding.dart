@@ -1,33 +1,33 @@
-
 import 'package:get/get.dart';
-import 'package:mobilidade_urbana_app/features/onboarding/data/data_sources/onboarding_local_datasource.dart';
-import 'package:mobilidade_urbana_app/features/onboarding/data/data_sources/onboarding_remote_datasource.dart';
-import 'package:mobilidade_urbana_app/features/onboarding/data/repository/onboarding_repository.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/presentation/controllers/onboarding_controller.dart';
+import 'package:mobilidade_urbana_app/features/profile/data/data_sources/preferences_remote_datasource.dart';
+import 'package:mobilidade_urbana_app/features/profile/data/repository/preferences_repository_impl.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/repository/preferences_repository.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/usecases/preferences/save_preferences_usecase.dart';
 
-class OnboadingBinding extends Bindings{
+class OnboardingBinding extends Bindings {
   @override
   void dependencies() {
+    Get.lazyPut<PreferencesRemoteDatasource>(
+          () => PreferencesRemoteDatasourceImpl(),
+    );
 
-      Get.lazyPut<OnboardingLocalDatasource>(
-            () => OnboardingLocalDatasource(),
-      );
+    Get.lazyPut<PreferencesRepository>(
+          () => PreferencesRepositoryImpl(
+        Get.find<PreferencesRemoteDatasource>(),
+      ),
+    );
 
-      Get.lazyPut<OnboardingRemoteDatasource>(
-            () => OnboardingRemoteDatasource(),
-      );
+    Get.lazyPut<SavePreferencesUseCase>(
+          () => SavePreferencesUseCase(
+        Get.find<PreferencesRepository>(),
+      ),
+    );
 
-      Get.lazyPut<OnboardingRepository>(
-            () => OnboardingRepository(
-          Get.find<OnboardingLocalDatasource>(),
-          Get.find<OnboardingRemoteDatasource>(),
-        ),
-      );
-
-      Get.lazyPut<OnBoardingController>(
-            () => OnBoardingController(
-          Get.find<OnboardingRepository>(),
-        ),
-      );
+    Get.lazyPut<OnBoardingController>(
+          () => OnBoardingController(
+        Get.find<SavePreferencesUseCase>(),
+      ),
+    );
   }
 }
