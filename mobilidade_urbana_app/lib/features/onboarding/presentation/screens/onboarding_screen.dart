@@ -1,6 +1,7 @@
 // presentation/screens/onboarding_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/presentation/controllers/onboarding_controller.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/presentation/widgets/dot_navigation.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/presentation/widgets/next_button.dart';
@@ -16,7 +17,7 @@ class OnboardingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = OnBoardingController.instance; 
+    final controller = Get.find<OnBoardingController>();
 
     return Scaffold(
       body: Stack(
