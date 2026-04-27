@@ -1,33 +1,19 @@
-
 import 'package:dio/dio.dart';
-import 'package:flutter/rendering.dart';
 import 'package:mobilidade_urbana_app/core/network/dio_client.dart';
-import 'package:mobilidade_urbana_app/features/onboarding/data/models/onboarding_model.dart';
-import 'package:mobilidade_urbana_app/features/onboarding/data/models/syng_result_model.dart';
+import 'package:mobilidade_urbana_app/features/profile/data/models/preferences_model.dart';
+
+abstract class OnboardingRemoteDatasource {
+  Future<PreferencesModel> savePreferences(Map<String, dynamic> data);
+}
+
+class OnboardingRemoteDatasourceImpl implements OnboardingRemoteDatasource {
+  final Dio _dio = DioClient.instance;
+
+  @override
+  Future<PreferencesModel> savePreferences(Map<String, dynamic> data) async {
+    final response = await _dio.post('/preferences', data: data);
+    return PreferencesModel.fromJson(response.data);
 
 
-class OnboardingRemoteDatasource {
-  final _dio = DioClient.instance;
-
-  Future<SyncResult> send(OnboardingModel data) async {
-    try {
-      final response = await _dio.post('/devices', data: data.toJson());
-
-      switch (response.statusCode) {
-        case 201:
-          return SyncResult.created;
-
-        case 409:
-          final existing = await _dio.get('/devices/${data.deviceToken}');
-          final isSameDevice = existing.data['device_token'] == data.deviceToken;
-          return isSameDevice ? SyncResult.alreadyExists : SyncResult.collision;
-
-        default:
-          return SyncResult.failed;
-      }
-    } on DioException catch (e) {
-      debugPrint('[OnboardingRemoteDatasource] Falha: ${e.message}');
-      return SyncResult.failed;
-    }
   }
 }
