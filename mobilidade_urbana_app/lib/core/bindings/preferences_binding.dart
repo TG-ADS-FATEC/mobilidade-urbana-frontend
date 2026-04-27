@@ -5,6 +5,7 @@ import 'package:mobilidade_urbana_app/features/profile/data/data_sources/prefere
 import 'package:mobilidade_urbana_app/features/profile/data/repository/preferences_repository_impl.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/repository/preferences_repository.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/usecases/preferences/get_preferences_usecase.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/usecases/preferences/save_preferences_usecase.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/usecases/preferences/update_preferences_usecase.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/controllers/preferences_controller.dart';
 
@@ -36,11 +37,18 @@ class PreferencesBinding extends Bindings{
       ),
     );
 
+    Get.lazyPut<SavePreferencesUseCase>(
+          () => SavePreferencesUseCase(
+        Get.find<PreferencesRepository>(),
+      ),
+    );
+
     // 4. Controller
     Get.lazyPut<PreferencesController>(
           () => PreferencesController(
         Get.find<GetPreferencesUsecase>(),
         Get.find<UpdatePreferencesUsecase>(),
+        Get.find<SavePreferencesUseCase>(),
       ),
     );
   }
