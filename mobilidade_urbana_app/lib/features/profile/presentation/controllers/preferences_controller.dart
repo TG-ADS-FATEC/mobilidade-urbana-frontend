@@ -2,14 +2,16 @@ import 'package:get/get.dart';
 import 'package:mobilidade_urbana_app/core/data_state/data_state.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/entities/preferences.entity.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/usecases/preferences/get_preferences_usecase.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/usecases/preferences/save_preferences_usecase.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/usecases/preferences/update_preferences_usecase.dart';
 
 class PreferencesController extends GetxController {
   final GetPreferencesUsecase _getPreferencesUsecase;
   final UpdatePreferencesUsecase _updatePreferencesUsecase;
+  final SavePreferencesUseCase _savePreferencesUseCase;
 
 
-  PreferencesController(this._getPreferencesUsecase, this._updatePreferencesUsecase);
+  PreferencesController(this._getPreferencesUsecase, this._updatePreferencesUsecase, this._savePreferencesUseCase);
 
   final Rx<PreferencesEntity?> preferences = Rx<PreferencesEntity?>(null);
   final RxBool isLoading = false.obs;
@@ -18,7 +20,6 @@ class PreferencesController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    final teste = 2;
     loadPreferences();
   }
 
@@ -75,7 +76,7 @@ class PreferencesController extends GetxController {
       isLoading.value = true;
       errorMessage.value = '';
 
-      final result = await _updatePreferencesUsecase(
+      final result = await _savePreferencesUseCase(
         preferences: newPreferences,
       );
 
