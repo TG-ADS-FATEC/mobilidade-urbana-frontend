@@ -1,10 +1,40 @@
 import 'package:equatable/equatable.dart';
 
-enum TransportType { bus, subway, walking, cycling, car }
-enum RoutePreference { fastest, shortest, leastWalking }
+enum TransportType {
+  bus('BUS'),
+  subway('SUBWAY'),
+  train('TRAIN'),
+  walking('WALKING'),
+  cycling('CYCLING'),
+  car('CAR');
+
+  final String value;
+  const TransportType(this.value);
+
+  static TransportType fromJson(String value) {
+    return TransportType.values.firstWhere(
+          (e) => e.value == value.toUpperCase(),
+      orElse: () => throw Exception('TransportType inválido: $value'),
+    );
+  }
+}
+
+enum RoutePreference {
+  fastest('FASTEST'),
+  shortest('SHORTEST'),
+  leastWalking('LEAST_WALKING');
+
+  final String value;
+  const RoutePreference(this.value);
+  static RoutePreference fromJson(String value) {
+    return RoutePreference.values.firstWhere(
+          (e) => e.value == value.toUpperCase(),
+      orElse: () => throw Exception('RoutePreference inválido: $value'),
+    );
+  }
+}
 
 class PreferencesEntity extends Equatable {
-  final int preferenceId;
   final List<TransportType> transportTypes;
   final RoutePreference routePreference;
   final bool slowPace;
@@ -13,13 +43,12 @@ class PreferencesEntity extends Equatable {
   final String deviceToken;
 
   const PreferencesEntity({
-    required this.preferenceId,
     required this.transportTypes,
     required this.routePreference,
     required this.slowPace,
     required this.maxWalkingTime,
     required this.updatedAt,
-    required this.deviceToken,
+    required this.deviceToken, Object? preferenceId,
   });
 
   PreferencesEntity copyWith({
@@ -32,7 +61,6 @@ class PreferencesEntity extends Equatable {
     String? deviceToken,
   }) {
     return PreferencesEntity(
-      preferenceId: preferenceId ?? this.preferenceId,
       transportTypes: transportTypes ?? this.transportTypes,
       routePreference: routePreference ?? this.routePreference,
       slowPace: slowPace ?? this.slowPace,
@@ -44,7 +72,6 @@ class PreferencesEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-    preferenceId,
     transportTypes,
     routePreference,
     slowPace,
