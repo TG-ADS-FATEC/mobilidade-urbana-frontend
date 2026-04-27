@@ -10,6 +10,7 @@ class PreferencesModel extends PreferencesEntity{
     required super.slowPace,
     required super.maxWalkingTime,
     required super.updatedAt,
+    required super.deviceToken,
   });
 
   factory PreferencesModel.fromEntity(PreferencesEntity entity) {
@@ -20,6 +21,7 @@ class PreferencesModel extends PreferencesEntity{
       slowPace: entity.slowPace,
       maxWalkingTime: entity.maxWalkingTime,
       updatedAt: entity.updatedAt,
+      deviceToken: entity.deviceToken,
     );
   }
 
@@ -31,6 +33,7 @@ class PreferencesModel extends PreferencesEntity{
       slowPace: json['slowPace'] as bool? ?? false,
       maxWalkingTime: json['maxWalkingTime'] as int? ?? 0,
       updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
+      deviceToken: json['deviceToken'] ?? '',
     );
   }
 
@@ -41,6 +44,7 @@ class PreferencesModel extends PreferencesEntity{
     'slowPace': slowPace,
     'maxWalkingTime': maxWalkingTime,
     'updatedAt': updatedAt.toIso8601String(),
+    'deviceToken': deviceToken,
   };
 
 

@@ -18,6 +18,7 @@ class PreferencesController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    final teste = 2;
     loadPreferences();
   }
 
@@ -68,4 +69,25 @@ class PreferencesController extends GetxController {
       isLoading.value = false;
     }
   }
+
+  Future<void> savePreferences(PreferencesEntity newPreferences) async {
+    try {
+      isLoading.value = true;
+      errorMessage.value = '';
+
+      final result = await _updatePreferencesUsecase(
+        preferences: newPreferences,
+      );
+
+      switch (result) {
+        case DataSuccess(:final data):
+          preferences.value = data;
+        case DataFailed(:final failure):
+          errorMessage.value = failure.message;
+      }
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
 }

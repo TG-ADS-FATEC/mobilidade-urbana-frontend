@@ -10,6 +10,7 @@ class PreferencesEntity extends Equatable {
   final bool slowPace;
   final int maxWalkingTime;
   final DateTime updatedAt;
+  final String deviceToken;
 
   const PreferencesEntity({
     required this.preferenceId,
@@ -18,6 +19,7 @@ class PreferencesEntity extends Equatable {
     required this.slowPace,
     required this.maxWalkingTime,
     required this.updatedAt,
+    required this.deviceToken,
   });
 
   PreferencesEntity copyWith({
@@ -27,6 +29,7 @@ class PreferencesEntity extends Equatable {
     bool? slowPace,
     int? maxWalkingTime,
     DateTime? updatedAt,
+    String? deviceToken,
   }) {
     return PreferencesEntity(
       preferenceId: preferenceId ?? this.preferenceId,
@@ -35,6 +38,7 @@ class PreferencesEntity extends Equatable {
       slowPace: slowPace ?? this.slowPace,
       maxWalkingTime: maxWalkingTime ?? this.maxWalkingTime,
       updatedAt: updatedAt ?? this.updatedAt,
+      deviceToken: deviceToken ?? this.deviceToken
     );
   }
 
@@ -46,5 +50,6 @@ class PreferencesEntity extends Equatable {
     slowPace,
     maxWalkingTime,
     updatedAt,
+    deviceToken,
   ];
 }

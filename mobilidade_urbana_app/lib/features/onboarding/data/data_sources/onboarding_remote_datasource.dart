@@ -15,7 +15,7 @@ class OnboardingRemoteDatasource {
 
       switch (response.statusCode) {
         case 201:
-          return SyncResult.created;      // ← só retorna, sem tocar no Hive
+          return SyncResult.created;
 
         case 409:
           final existing = await _dio.get('/devices/${data.deviceToken}');

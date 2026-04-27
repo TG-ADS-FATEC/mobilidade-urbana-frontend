@@ -34,6 +34,6 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
 
   @override
   Future<void> deleteProfile() async {
-    await _dio.delete('/profile');
+    await _dio.delete('/devices/me');
   }
 }

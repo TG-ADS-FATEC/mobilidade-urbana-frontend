@@ -90,6 +90,7 @@ class ProfileController extends GetxController {
       switch (result) {
         case DataSuccess(:final data):
           profile.value = null;
+          Get.offAllNamed('/welcome');
         case DataFailed(:final failure):
           errorMessage.value = failure.message;
       }

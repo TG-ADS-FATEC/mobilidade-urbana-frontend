@@ -7,7 +7,7 @@ import 'package:mobilidade_urbana_app/core/services/device_token_service.dart';
 
 class AuthService {
 
-  static Future<DataState<String>> authenticate() async {
+  static Future<DataState<List<String>>> authenticate() async {
     final dio = DioClient.instance;
     try {
       final deviceToken = await DeviceTokenService.get();
@@ -25,7 +25,7 @@ class AuthService {
 
       final jwt = response.data['token'] as String;
       await DeviceTokenService.saveJwt(jwt);
-      return DataSuccess(jwt);
+      return DataSuccess([jwt, deviceToken]);
 
     } on DioException catch (e) {
       debugPrint('[AuthService] Falha: ${e.message}');
