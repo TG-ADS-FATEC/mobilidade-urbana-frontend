@@ -8,6 +8,7 @@ import 'package:mobilidade_urbana_app/features/onboarding/presentation/screens/s
 import 'package:mobilidade_urbana_app/features/profile/presentation/screens/edit_profile_screen.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/screens/profile_screen.dart';
 import 'package:mobilidade_urbana_app/features/welcome/presentation/screens/welcome_screen.dart';
+import 'package:mobilidade_urbana_app/navigation_menu.dart';
 
 class AppRoutes {
   static final routes = [
@@ -26,7 +27,7 @@ class AppRoutes {
     ),
     GetPage(
       name: '/home',
-      page: () => HomeScreen(),
+      page: () =>  NavigationMenu(),
     ),
     GetPage(
       name: '/profile',
