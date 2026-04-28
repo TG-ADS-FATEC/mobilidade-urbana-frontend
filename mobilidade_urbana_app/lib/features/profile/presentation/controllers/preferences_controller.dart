@@ -10,17 +10,29 @@ class PreferencesController extends GetxController {
   final UpdatePreferencesUsecase _updatePreferencesUsecase;
   final SavePreferencesUseCase _savePreferencesUseCase;
 
-
-  PreferencesController(this._getPreferencesUsecase, this._updatePreferencesUsecase, this._savePreferencesUseCase);
+  PreferencesController(
+      this._getPreferencesUsecase,
+      this._updatePreferencesUsecase,
+      this._savePreferencesUseCase,
+      );
 
   final Rx<PreferencesEntity?> preferences = Rx<PreferencesEntity?>(null);
   final RxBool isLoading = false.obs;
+  final RxBool isSaved = false.obs;
   final RxString errorMessage = ''.obs;
+
+  Worker? _savedFeedbackWorker;
 
   @override
   void onInit() {
     super.onInit();
     loadPreferences();
+  }
+
+  @override
+  void onClose() {
+    _savedFeedbackWorker?.dispose();
+    super.onClose();
   }
 
   Future<void> loadPreferences() async {
@@ -45,7 +57,8 @@ class PreferencesController extends GetxController {
     if (preferences.value == null) return;
 
     try {
-      isLoading.value =  true;
+      isLoading.value = true;
+      isSaved.value = false;
       errorMessage.value = '';
 
       final updated = preferences.value!.copyWith(
@@ -56,13 +69,14 @@ class PreferencesController extends GetxController {
         updatedAt: DateTime.now(),
       );
 
-      final result = await _updatePreferencesUsecase(
-        preferences: updated,
-      );
+      final result = await _updatePreferencesUsecase(preferences: updated);
 
       switch (result) {
         case DataSuccess(:final data):
           preferences.value = data;
+          isSaved.value = true;
+          // volta para false após 2 segundos
+          Future.delayed(const Duration(seconds: 2), () => isSaved.value = false);
         case DataFailed(:final failure):
           errorMessage.value = failure.message;
       }
@@ -76,13 +90,13 @@ class PreferencesController extends GetxController {
       isLoading.value = true;
       errorMessage.value = '';
 
-      final result = await _savePreferencesUseCase(
-        preferences: newPreferences,
-      );
+      final result = await _savePreferencesUseCase(preferences: newPreferences);
 
       switch (result) {
         case DataSuccess(:final data):
           preferences.value = data;
+          isSaved.value = true;
+          Future.delayed(const Duration(seconds: 2), () => isSaved.value = false);
         case DataFailed(:final failure):
           errorMessage.value = failure.message;
       }
@@ -90,5 +104,4 @@ class PreferencesController extends GetxController {
       isLoading.value = false;
     }
   }
-
 }
