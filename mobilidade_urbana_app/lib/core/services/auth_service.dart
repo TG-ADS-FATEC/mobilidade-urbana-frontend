@@ -22,7 +22,6 @@ class AuthService {
               : 'IOS',
         },
       );
-      debugPrint('[AuthService] deviceToken usado na autenticação: $deviceToken');
 
       final jwt = response.data['token'] as String;
       await DeviceTokenService.saveJwt(jwt);
