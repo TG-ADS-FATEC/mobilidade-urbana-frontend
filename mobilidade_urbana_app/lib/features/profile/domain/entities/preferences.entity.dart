@@ -3,10 +3,7 @@ import 'package:equatable/equatable.dart';
 enum TransportType {
   bus('BUS'),
   subway('SUBWAY'),
-  train('TRAIN'),
-  walking('WALKING'),
-  cycling('CYCLING'),
-  car('CAR');
+  train('TRAIN');
 
   final String value;
   const TransportType(this.value);
