@@ -6,13 +6,12 @@ import 'package:mobilidade_urbana_app/core/network/dio_client.dart';
 import 'package:mobilidade_urbana_app/core/services/device_token_service.dart';
 
 class AuthService {
-
-  static Future<DataState<List<String>>> authenticate() async {
-    final dio = DioClient.instance;
+  static Future<DataState<List<String>>> authenticate({Dio? dio}) async {
+    final client = dio ?? DioClient.instance;
     try {
       final deviceToken = await DeviceTokenService.get();
 
-      final response = await dio.post(
+      final response = await client.post(
         '/authentication/devices/register',
         data: {
           'deviceToken': deviceToken,
