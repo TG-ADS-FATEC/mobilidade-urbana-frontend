@@ -1,34 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/presentation/controllers/onboarding_controller.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
 import 'package:mobilidade_urbana_app/utils/helpers/helper_functions.dart';
 import 'walking_duration_bottom_sheet.dart';
 
-class OnboardingWalkingOptions extends StatelessWidget {
+class OnboardingWalkingOptions extends ConsumerWidget {
   const OnboardingWalkingOptions({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(onboardingControllerProvider);
+    final notifier = ref.read(onboardingControllerProvider.notifier);
     final isDark = THelperFunctions.isDarkMode(context);
-    final controller = OnBoardingController.instance;
 
-    return Obx(() => Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: TSizes.spaceBtwSections),
         _WalkingPaceSwitch(
           isDark: isDark,
-          value: controller.slowWalkingPace.value,
-          onChanged: controller.updateSlowWalkingPace,
+          value: state.slowWalkingPace,
+          onChanged: notifier.updateSlowWalkingPace,
         ),
         const SizedBox(height: TSizes.spaceBtwSections),
         _WalkingDurationSection(
-          duration: controller.walkingDuration.value,
+          duration: state.walkingDuration,
         ),
       ],
-    ));
+    );
   }
 }
 

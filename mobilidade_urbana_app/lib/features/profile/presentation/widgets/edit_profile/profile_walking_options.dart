@@ -1,59 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/entities/preferences.entity.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/controllers/preferences_controller.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
 import 'package:mobilidade_urbana_app/utils/helpers/helper_functions.dart';
 
-class ProfileWalkingOptions extends StatelessWidget {
+class ProfileWalkingOptions extends ConsumerWidget {
   const ProfileWalkingOptions({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(preferencesControllerProvider);
+    final notifier = ref.read(preferencesControllerProvider.notifier);
     final isDark = THelperFunctions.isDarkMode(context);
-    final controller = Get.find<PreferencesController>();
 
-    return Obx(() {
-      final current = controller.preferences.value;
-      if (current == null) return const SizedBox.shrink();
+    final current = state.preferences;
+    if (current == null) return const SizedBox.shrink();
 
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: TSizes.spaceBtwSections),
-          _WalkingPaceSwitch(
-            isDark: isDark,
-            value: current.slowPace,
-            onChanged: (value) {
-              controller.updatePreferences(
-                current.copyWith(slowPace: value),
-              );
-            },
-          ),
-          const SizedBox(height: TSizes.spaceBtwSections),
-          _WalkingDurationSection(
-            duration: current.maxWalkingTime.toDouble(),
-            onTap: () => _showDurationPicker(context, controller, current),
-          ),
-        ],
-      );
-    });
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: TSizes.spaceBtwSections),
+        _WalkingPaceSwitch(
+          isDark: isDark,
+          value: current.slowPace,
+          onChanged: (value) {
+            notifier.updatePreferences(current.copyWith(slowPace: value));
+          },
+        ),
+        const SizedBox(height: TSizes.spaceBtwSections),
+        _WalkingDurationSection(
+          duration: current.maxWalkingTime.toDouble(),
+          onTap: () => _showDurationPicker(context, notifier, current),
+        ),
+      ],
+    );
   }
 
   void _showDurationPicker(
-      BuildContext context,
-      PreferencesController controller,
-      PreferencesEntity current,
-      ) {
+    BuildContext context,
+    PreferencesNotifier notifier,
+    PreferencesEntity current,
+  ) {
     showModalBottomSheet(
       context: context,
       builder: (_) => _WalkingDurationBottomSheet(
         initialValue: current.maxWalkingTime,
         onConfirm: (value) {
-          controller.updatePreferences(
-            current.copyWith(maxWalkingTime: value),
-          );
+          notifier.updatePreferences(current.copyWith(maxWalkingTime: value));
         },
       ),
     );
@@ -134,7 +129,9 @@ class _WalkingDurationSection extends StatelessWidget {
             const SizedBox(width: TSizes.spaceBtwItems),
             Expanded(
               child: Text(
-                duration >= 60 ? 'Padrão (sem limite)' : '${duration.toInt()} min',
+                duration >= 60
+                    ? 'Padrão (sem limite)'
+                    : '${duration.toInt()} min',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),

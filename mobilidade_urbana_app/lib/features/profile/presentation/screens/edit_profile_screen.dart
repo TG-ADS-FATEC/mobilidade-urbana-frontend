@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/controllers/preferences_controller.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/edit_profile/profile_route_selector.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/edit_profile/profile_transport_selector.dart';
@@ -7,46 +7,41 @@ import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/edit
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
 import 'package:mobilidade_urbana_app/core/widgets/appbar.dart';
 
-class EditProfileScreen extends StatelessWidget {
+class EditProfileScreen extends ConsumerWidget {
   const EditProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.find<PreferencesController>();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(preferencesControllerProvider);
 
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
             TAppBar(
-              title: const Text("Editar Perfil"),
+              title: const Text('Editar Perfil'),
               showBackArrow: true,
               actions: [
-                Obx(() {
-                  if (controller.isLoading.value) {
-                    return const Padding(
-                      padding: EdgeInsets.only(right: 16),
-                      child: SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    );
-                  }
-                  if (controller.isSaved.value) {
-                    return const Padding(
-                      padding: EdgeInsets.only(right: 16),
-                      child: Row(
-                        children: [
-                          Text("Salvo", style: TextStyle(color: Colors.green)),
-                          SizedBox(width: 4),
-                          Icon(Icons.check_circle, color: Colors.green),
-                        ],
-                      ),
-                    );
-                  }
-                  return const SizedBox.shrink();
-                }),
+                if (state.isLoading)
+                  const Padding(
+                    padding: EdgeInsets.only(right: 16),
+                    child: SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  )
+                else if (state.isSaved)
+                  const Padding(
+                    padding: EdgeInsets.only(right: 16),
+                    child: Row(
+                      children: [
+                        Text('Salvo', style: TextStyle(color: Colors.green)),
+                        SizedBox(width: 4),
+                        Icon(Icons.check_circle, color: Colors.green),
+                      ],
+                    ),
+                  ),
               ],
             ),
             Padding(
@@ -54,12 +49,12 @@ class EditProfileScreen extends StatelessWidget {
                 horizontal: TSizes.xs,
                 vertical: TSizes.sm,
               ),
-              child: Column(
+              child: const Column(
                 children: [
-                  const SizedBox(height: 40),
+                  SizedBox(height: 40),
                   ProfileRouteSelector(),
-                  const ProfileTransportSelector(),
-                  const ProfileWalkingOptions(),
+                  ProfileTransportSelector(),
+                  ProfileWalkingOptions(),
                 ],
               ),
             ),

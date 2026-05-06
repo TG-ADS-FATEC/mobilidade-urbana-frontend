@@ -14,7 +14,6 @@ class DioClient {
       baseUrl: 'http://10.0.2.2:8080',
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
-      validateStatus: (status) => status != null && status < 500,
       headers: {'Content-Type': 'application/json'},
     ));
 
@@ -24,9 +23,9 @@ class DioClient {
 
         if (!isPublic) {
           final jwt = await DeviceTokenService.getJwt();
+          if (kDebugMode) debugPrint('[DioClient] JWT: $jwt');
           if (jwt != null) {
             options.headers['Authorization'] = 'Bearer $jwt';
-
           }
         }
 
@@ -46,28 +45,29 @@ class DioClient {
         handler.next(response);
       },
       onError: (DioException e, handler) async {
-        if (e.response?.statusCode == 401) {
+        if (kDebugMode) {
+          debugPrint(
+            '[DioClient] ${e.requestOptions.method} '
+                '${e.requestOptions.path} → ${e.response?.statusCode ?? e.message}',
+          );
+        }
+
+        final isRetry = e.requestOptions.extra['retried'] == true;
+
+        if (e.response?.statusCode == 401 && !isRetry) {
           final result = await AuthService.authenticate();
 
-          if (result is DataSuccess<String>) {
+          if (result is DataSuccess) {
             final jwt = await DeviceTokenService.getJwt();
-
             e.requestOptions.headers['Authorization'] = 'Bearer $jwt';
+            e.requestOptions.extra['retried'] = true;
             final retryResponse = await instance.fetch(e.requestOptions);
             handler.resolve(retryResponse);
           } else {
-            if (kDebugMode) {
-              debugPrint('[DioClient] Falha ao renovar token');
-            }
+            if (kDebugMode) debugPrint('[DioClient] Falha ao renovar token');
             handler.next(e);
           }
         } else {
-          if (kDebugMode) {
-            debugPrint(
-              '[DioClient] ${e.requestOptions.method} '
-                  '${e.requestOptions.path} → ${e.message}',
-            );
-          }
           handler.next(e);
         }
       },

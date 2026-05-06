@@ -1,7 +1,4 @@
-import 'package:get/get.dart';
-import 'package:mobilidade_urbana_app/core/bindings/onboading_binding.dart';
-import 'package:mobilidade_urbana_app/core/bindings/preferences_binding.dart';
-import 'package:mobilidade_urbana_app/core/bindings/profile_binding.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobilidade_urbana_app/features/home/presentation/screens/home_screen.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/presentation/screens/success_screen.dart';
@@ -10,34 +7,34 @@ import 'package:mobilidade_urbana_app/features/profile/presentation/screens/prof
 import 'package:mobilidade_urbana_app/features/welcome/presentation/screens/welcome_screen.dart';
 import 'package:mobilidade_urbana_app/navigation_menu.dart';
 
-class AppRoutes {
-  static final routes = [
-    GetPage(
-      name: '/welcome',
-      page: () => WelcomeScreen(),
-    ),
-    GetPage(
-      name: '/onboarding',
-      page: () => OnboardingScreen(),
-      binding: OnboardingBinding(),
-    ),
-    GetPage(
-      name: '/onboarding-success',
-      page: () => OnboardingSuccessScreen(),
-    ),
-    GetPage(
-      name: '/home',
-      page: () =>  NavigationMenu(),
-    ),
-    GetPage(
-      name: '/profile',
-      page: () => ProfileScreen(),
-      binding: ProfileBinding(),
-    ),
-    GetPage(
-      name: '/profile/edit-profile',
-      page: () => const EditProfileScreen(),
-      bindings: [ProfileBinding(), PreferencesBinding()],
-    ),
-  ];
+class AppRouter {
+  static GoRouter router(bool isOnboardingComplete) => GoRouter(
+        initialLocation: isOnboardingComplete ? '/home' : '/welcome',
+        routes: [
+          GoRoute(
+            path: '/welcome',
+            builder: (context, state) => const WelcomeScreen(),
+          ),
+          GoRoute(
+            path: '/onboarding',
+            builder: (context, state) => const OnboardingScreen(),
+          ),
+          GoRoute(
+            path: '/onboarding-success',
+            builder: (context, state) => const OnboardingSuccessScreen(),
+          ),
+          GoRoute(
+            path: '/home',
+            builder: (context, state) => const NavigationMenu(),
+          ),
+          GoRoute(
+            path: '/profile',
+            builder: (context, state) => const ProfileScreen(),
+          ),
+          GoRoute(
+            path: '/profile/edit-profile',
+            builder: (context, state) => const EditProfileScreen(),
+          ),
+        ],
+      );
 }

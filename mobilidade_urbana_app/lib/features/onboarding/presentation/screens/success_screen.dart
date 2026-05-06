@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
-import 'package:mobilidade_urbana_app/navigation_menu.dart';
 
 class OnboardingSuccessScreen extends StatefulWidget {
   const OnboardingSuccessScreen({super.key});
@@ -18,12 +17,10 @@ class _OnboardingSuccessScreenState extends State<OnboardingSuccessScreen>
   @override
   void initState() {
     super.initState();
-
     _controller = AnimationController(vsync: this);
-
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        Get.offAll(() => const NavigationMenu());
+        context.go('/home');
       }
     });
   }
@@ -57,9 +54,8 @@ class _OnboardingSuccessScreenState extends State<OnboardingSuccessScreen>
             onLoaded: _onLottieLoaded,
             errorBuilder: (context, error, stackTrace) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                // Get.offAll(() => const HomeScreen());
+                context.go('/home');
               });
-
               return Icon(
                 Icons.check_circle_rounded,
                 size: 80,
