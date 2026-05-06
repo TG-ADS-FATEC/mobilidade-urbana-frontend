@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
 
 class OnBoardingPageLayout1 extends StatelessWidget {
@@ -40,6 +39,20 @@ class OnBoardingPageLayout1 extends StatelessWidget {
             const SizedBox(height: TSizes.spaceBtwSections),
             child!,
           ],
+          // ElevatedButton(
+          //   onPressed: () async {
+          //     final result = await AuthService.authenticate();
+          //     switch (result) {
+          //       case DataSuccess<List<String>>(:final data):
+          //         debugPrint('[Auth] JWT: ${data[0]}, DeviceToken: ${data[1]}');
+          //         Get.snackbar('Sucesso', 'JWT obtido!');
+          //       case DataFailed<List<String>>(:final failure):
+          //         debugPrint('[Auth] Falha: ${failure.message}');
+          //         Get.snackbar('Erro', failure.message);
+          //     }
+          //   },
+          //   child: const Text('Testar Auth'),
+          // ),
         ],
       ),
     );

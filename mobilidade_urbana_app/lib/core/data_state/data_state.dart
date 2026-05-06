@@ -11,5 +11,5 @@ final class DataSuccess<T> extends DataState<T> {
 
 final class DataFailed<T> extends DataState<T> {
   final AppFailure failure;
-  const DataFailed(this.failure);
+  const DataFailed(this.failure, {String? message});
 }

@@ -3,6 +3,7 @@
 import 'package:dio/dio.dart';
 import 'package:mobilidade_urbana_app/core/data_state/data_state.dart';
 import 'package:mobilidade_urbana_app/core/error/failures.dart';
+import 'package:mobilidade_urbana_app/core/services/device_token_service.dart';
 import 'package:mobilidade_urbana_app/features/profile/data/data_sources/preferences_remote_datasource.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/entities/preferences.entity.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/repository/preferences_repository.dart';
@@ -30,9 +31,13 @@ class PreferencesRepositoryImpl implements PreferencesRepository{
   @override
   Future<DataState<PreferencesEntity>> savePreference({required PreferencesEntity preferences}) async {
     try {
-      final model = await _remoteDataSource.savePreferences(
-        PreferencesModel.fromEntity(preferences).toJson(),
-      );
+      final deviceToken = await DeviceTokenService.get();
+
+      final json = PreferencesModel.fromEntity(preferences).toJson();
+      json['deviceToken'] = deviceToken;
+
+      final model = await _remoteDataSource.savePreferences(json);
+
       return DataSuccess(model);
     } on DioException catch (e) {
       return DataFailed(

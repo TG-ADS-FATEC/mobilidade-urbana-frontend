@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/app_bar/edit_profile_icon.dart';
 import 'package:mobilidade_urbana_app/core/widgets/appbar.dart';
 
@@ -14,9 +14,12 @@ class TProfileAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TAppBar(
-      title: Text("Perfil"),
+      title: const Text('Perfil'),
       actions: [
-        TEditProfileIcon(isDark: isDark, onPressed: () => Get.toNamed('/profile/edit-profile')),
+        TEditProfileIcon(
+          isDark: isDark,
+          onPressed: () => context.push('/profile/edit-profile'),
+        ),
       ],
     );
   }

@@ -25,6 +25,11 @@ class DeviceTokenService {
     return token;
   }
 
+  static Future<void> delete() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_key);
+  }
+
 
   static Future<void> saveJwt(String jwt) async {
     final prefs = await SharedPreferences.getInstance();
@@ -34,5 +39,10 @@ class DeviceTokenService {
   static Future<String?> getJwt() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_jwtKey);
+  }
+
+  static Future<void> deleteJwt() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_jwtKey);
   }
 }

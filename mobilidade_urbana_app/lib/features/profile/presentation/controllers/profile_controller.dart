@@ -1,101 +1,117 @@
-
-
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobilidade_urbana_app/core/data_state/data_state.dart';
-import 'package:mobilidade_urbana_app/core/widgets/confirm_dialog.dart';
+import 'package:mobilidade_urbana_app/core/di/service_locator.dart';
+import 'package:mobilidade_urbana_app/core/services/device_token_service.dart';
+import 'package:mobilidade_urbana_app/core/services/onboarding_service.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/entities/profile.entity.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/usecases/profile/delete_profile_usecase.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/usecases/profile/get_profile_usecase.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/usecases/profile/update_profile_usecase.dart';
 
-class ProfileController extends GetxController {
-  final GetProfileUseCase _getProfileUseCase;
-  final UpdateProfileUseCase _updateProfileUseCase;
-  final DeleteProfileUseCase _deleteProfileUseCase;
+class ProfileState {
+  final ProfileEntity? profile;
+  final bool isLoading;
+  final String errorMessage;
+  final bool navigateToWelcome;
 
-  ProfileController(this._getProfileUseCase, this._updateProfileUseCase, this._deleteProfileUseCase);
+  const ProfileState({
+    this.profile,
+    this.isLoading = false,
+    this.errorMessage = '',
+    this.navigateToWelcome = false,
+  });
 
-  final Rx<ProfileEntity?> profile = Rx<ProfileEntity?>(null);
-  final RxBool isLoading = false.obs;
-  final RxString errorMessage = ''.obs;
+  ProfileState copyWith({
+    ProfileEntity? profile,
+    bool? isLoading,
+    String? errorMessage,
+    bool? navigateToWelcome,
+  }) {
+    return ProfileState(
+      profile: profile ?? this.profile,
+      isLoading: isLoading ?? this.isLoading,
+      errorMessage: errorMessage ?? this.errorMessage,
+      navigateToWelcome: navigateToWelcome ?? this.navigateToWelcome,
+    );
+  }
+}
+
+class ProfileNotifier extends Notifier<ProfileState> {
+  late final GetProfileUseCase _getProfileUseCase;
+  late final UpdateProfileUseCase _updateProfileUseCase;
+  late final DeleteProfileUseCase _deleteProfileUseCase;
 
   @override
-  void onInit() {
-    super.onInit();
+  ProfileState build() {
+    _getProfileUseCase = sl<GetProfileUseCase>();
+    _updateProfileUseCase = sl<UpdateProfileUseCase>();
+    _deleteProfileUseCase = sl<DeleteProfileUseCase>();
     loadProfile();
+    return const ProfileState();
   }
 
   Future<void> loadProfile() async {
     try {
-      isLoading.value = true;
-      errorMessage.value = '';
-
+      state = state.copyWith(isLoading: true, errorMessage: '');
       final result = await _getProfileUseCase();
-
       switch (result) {
         case DataSuccess(:final data):
-          profile.value = data;
+          state = state.copyWith(profile: data, isLoading: false);
         case DataFailed(:final failure):
-          errorMessage.value = failure.message;
+          state = state.copyWith(errorMessage: failure.message, isLoading: false);
       }
-    } finally {
-      isLoading.value = false;
+    } catch (_) {
+      state = state.copyWith(isLoading: false);
     }
   }
 
   Future<void> updateProfile(ProfileEntity updatedProfile) async {
-    if (profile.value == null) return;
-
+    if (state.profile == null) return;
     try {
-      isLoading.value =  true;
-      errorMessage.value = '';
-
-      final updated = profile.value!.copyWith(
+      state = state.copyWith(isLoading: true, errorMessage: '');
+      final updated = state.profile!.copyWith(
         name: updatedProfile.name,
         avatarPath: updatedProfile.avatarPath,
       );
-
-      final result = await _updateProfileUseCase(
-        profile: updated,
-      );
-
+      final result = await _updateProfileUseCase(profile: updated);
       switch (result) {
         case DataSuccess(:final data):
-          profile.value = data;
+          state = state.copyWith(profile: data, isLoading: false);
         case DataFailed(:final failure):
-          errorMessage.value = failure.message;
+          state = state.copyWith(errorMessage: failure.message, isLoading: false);
       }
-    } finally {
-      isLoading.value = false;
+    } catch (_) {
+      state = state.copyWith(isLoading: false);
     }
   }
 
   Future<void> deleteProfile() async {
-
-    final confirmed = await ConfirmDialog.show(
-      title: 'Excluir conta',
-      message: 'Tem certeza? Essa ação não pode ser desfeita.',
-      confirmText: 'Excluir',
-      isDangerous: true,
-    );
-
-    if (confirmed != true) return; //
-
     try {
-      isLoading.value = true;
-      errorMessage.value = '';
-
+      state = state.copyWith(isLoading: true, errorMessage: '');
       final result = await _deleteProfileUseCase();
-
       switch (result) {
-        case DataSuccess(:final data):
-          profile.value = null;
+        case DataSuccess():
+          await DeviceTokenService.deleteJwt();
+          await DeviceTokenService.delete();
+          await OnboardingService.clear();
+          state = state.copyWith(
+            profile: null,
+            isLoading: false,
+            navigateToWelcome: true,
+          );
         case DataFailed(:final failure):
-          errorMessage.value = failure.message;
+          state = state.copyWith(errorMessage: failure.message, isLoading: false);
       }
-    } finally {
-      isLoading.value = false;
+    } catch (_) {
+      state = state.copyWith(isLoading: false);
     }
   }
 
+  void clearNavigation() =>
+      state = state.copyWith(navigateToWelcome: false);
 }
+
+final profileControllerProvider =
+    NotifierProvider<ProfileNotifier, ProfileState>(
+  () => ProfileNotifier(),
+);

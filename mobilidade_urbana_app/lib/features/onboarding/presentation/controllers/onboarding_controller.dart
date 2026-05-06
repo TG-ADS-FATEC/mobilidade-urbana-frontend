@@ -1,125 +1,193 @@
-// presentation/controllers/onboarding_controller.dart
-
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import '../screens/success_screen.dart';
-import '../../data/repositories/onboarding_repository.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobilidade_urbana_app/core/data_state/data_state.dart';
+import 'package:mobilidade_urbana_app/core/di/service_locator.dart';
+import 'package:mobilidade_urbana_app/core/services/device_token_service.dart';
+import 'package:mobilidade_urbana_app/core/services/onboarding_service.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/entities/preferences.entity.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/usecases/preferences/save_preferences_usecase.dart';
 
-class OnBoardingController extends GetxController {
-  static OnBoardingController get instance => Get.find();
+enum OnboardingNavigation { none, back, success }
 
-  final OnboardingRepository _repository;
-  OnBoardingController(this._repository);
+class OnboardingState {
+  final int currentPageIndex;
+  final bool isSaving;
+  final bool isShowingValidationSnackbar;
+  final RoutePreference selectedRoutePreference;
+  final Set<TransportType> selectedTransports;
+  final bool slowWalkingPace;
+  final double walkingDuration;
+  final String errorMessage;
+  final OnboardingNavigation navigation;
 
-  final pageController = PageController();
-  final currentPageIndex = 0.obs;
-
-  final selectedRoutePreference = 'Mais rápida'.obs;
-  final transportPreferences = <String, bool>{
-    'Ônibus': false,
-    'Trem': false,
-    'Metrô': false,
-  }.obs;
-  final slowWalkingPace = false.obs;
-  final walkingDuration = 10.0.obs;
-  final isShowingValidationSnackbar = false.obs;
-  final isSaving = false.obs;
-
-  // ← removido: _deviceToken e DeviceTokenService
-  // ← removido: onInit com DeviceTokenService.get()
+  const OnboardingState({
+    this.currentPageIndex = 0,
+    this.isSaving = false,
+    this.isShowingValidationSnackbar = false,
+    this.selectedRoutePreference = RoutePreference.fastest,
+    this.selectedTransports = const {},
+    this.slowWalkingPace = false,
+    this.walkingDuration = 10.0,
+    this.errorMessage = '',
+    this.navigation = OnboardingNavigation.none,
+  });
 
   bool get canGoNext {
-    switch (currentPageIndex.value) {
-      case 0: return transportPreferences.values.any((v) => v);
-      case 1: return selectedRoutePreference.value.isNotEmpty;
-      case 2: return true;
-      default: return false;
+    switch (currentPageIndex) {
+      case 0:
+        return selectedTransports.isNotEmpty;
+      default:
+        return true;
     }
   }
 
-  void updatePageIndicator(index) => currentPageIndex.value = index;
+  OnboardingState copyWith({
+    int? currentPageIndex,
+    bool? isSaving,
+    bool? isShowingValidationSnackbar,
+    RoutePreference? selectedRoutePreference,
+    Set<TransportType>? selectedTransports,
+    bool? slowWalkingPace,
+    double? walkingDuration,
+    String? errorMessage,
+    OnboardingNavigation? navigation,
+  }) {
+    return OnboardingState(
+      currentPageIndex: currentPageIndex ?? this.currentPageIndex,
+      isSaving: isSaving ?? this.isSaving,
+      isShowingValidationSnackbar:
+          isShowingValidationSnackbar ?? this.isShowingValidationSnackbar,
+      selectedRoutePreference:
+          selectedRoutePreference ?? this.selectedRoutePreference,
+      selectedTransports: selectedTransports ?? this.selectedTransports,
+      slowWalkingPace: slowWalkingPace ?? this.slowWalkingPace,
+      walkingDuration: walkingDuration ?? this.walkingDuration,
+      errorMessage: errorMessage ?? this.errorMessage,
+      navigation: navigation ?? this.navigation,
+    );
+  }
+}
 
-  void dotNavigationClick(index) {
-    currentPageIndex.value = index;
+class OnboardingNotifier extends Notifier<OnboardingState> {
+  late final SavePreferencesUseCase _savePreferencesUseCase;
+  final pageController = PageController();
+
+  @override
+  OnboardingState build() {
+    _savePreferencesUseCase = sl<SavePreferencesUseCase>();
+    ref.onDispose(pageController.dispose);
+    return const OnboardingState();
+  }
+
+  void updatePageIndicator(int index) =>
+      state = state.copyWith(currentPageIndex: index);
+
+  void dotNavigationClick(int index) {
+    state = state.copyWith(currentPageIndex: index);
     pageController.jumpToPage(index);
   }
 
-  void toggleTransport(String transport, bool value) {
-    transportPreferences[transport] = value;
-    transportPreferences.refresh();
-  }
-
-  bool isTransportEnabled(String transport) =>
-      transportPreferences[transport] ?? false;
-
-  void updateRoutePreference(String value) =>
-      selectedRoutePreference.value = value;
-
-  void updateSlowWalkingPace(bool value) => slowWalkingPace.value = value;
-
-  void updateWalkingDuration(double value) => walkingDuration.value = value;
-
   void previousPage() {
-    if (currentPageIndex.value == 0) { Get.back(); return; }
+    if (state.currentPageIndex == 0) {
+      state = state.copyWith(navigation: OnboardingNavigation.back);
+      return;
+    }
     pageController.animateToPage(
-      currentPageIndex.value - 1,
+      state.currentPageIndex - 1,
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
   }
 
-  void skipPage() {
-    currentPageIndex.value = 2;
-    pageController.jumpToPage(2);
-  }
-
   void nextPage() {
-    if (!canGoNext) { showValidationSnackbar(); return; }
-    if (currentPageIndex.value == 2) {
+    if (!state.canGoNext) {
+      _showValidationSnackbar();
+      return;
+    }
+    if (state.currentPageIndex == 2) {
       _saveAndNavigate();
     } else {
       pageController.animateToPage(
-        currentPageIndex.value + 1,
+        state.currentPageIndex + 1,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     }
   }
 
-  Future<void> _saveAndNavigate() async {
-    isSaving.value = true;
-
-    await _repository.savePreferences(
-      transports: transportPreferences.entries
-          .where((e) => e.value)
-          .map((e) => e.key)
-          .toList(),
-      routePreference: selectedRoutePreference.value,
-      slowWalking: slowWalkingPace.value,
-      walkingDuration: walkingDuration.value,
-    );
-
-    Get.to(() => const OnboardingSuccessScreen());
-    isSaving.value = false;
+  void skipPage() {
+    state = state.copyWith(currentPageIndex: 2);
+    pageController.jumpToPage(2);
   }
 
-  void showValidationSnackbar() {
-    if (isShowingValidationSnackbar.value) return;
-    isShowingValidationSnackbar.value = true;
-    final messages = {
-      0: 'Selecione pelo menos um meio de transporte.',
-      1: 'Selecione uma preferência de rota.',
-    };
-    Get.snackbar(
-      'Atenção',
-      messages[currentPageIndex.value] ??
-          'Preencha as informações antes de continuar.',
-      snackPosition: SnackPosition.BOTTOM,
-      margin: const EdgeInsets.all(16),
-      duration: const Duration(seconds: 2),
+  void toggleTransport(TransportType transport) {
+    final updated = Set<TransportType>.from(state.selectedTransports);
+    if (updated.contains(transport)) {
+      updated.remove(transport);
+    } else {
+      updated.add(transport);
+    }
+    state = state.copyWith(selectedTransports: updated);
+  }
+
+  bool isTransportSelected(TransportType transport) =>
+      state.selectedTransports.contains(transport);
+
+  void updateRoutePreference(RoutePreference value) =>
+      state = state.copyWith(selectedRoutePreference: value);
+
+  void updateSlowWalkingPace(bool value) =>
+      state = state.copyWith(slowWalkingPace: value);
+
+  void updateWalkingDuration(double value) =>
+      state = state.copyWith(walkingDuration: value);
+
+  void clearNavigation() =>
+      state = state.copyWith(navigation: OnboardingNavigation.none);
+
+  Future<void> _saveAndNavigate() async {
+    state = state.copyWith(isSaving: true);
+
+    final deviceToken = await DeviceTokenService.get();
+
+    final preferences = PreferencesEntity(
+      transportTypes: state.selectedTransports.toList(),
+      routePreference: state.selectedRoutePreference,
+      slowPace: state.slowWalkingPace,
+      maxWalkingTime: state.walkingDuration.toInt(),
+      updatedAt: DateTime.now(),
+      deviceToken: deviceToken,
     );
-    Future.delayed(const Duration(seconds: 2), () {
-      isShowingValidationSnackbar.value = false;
-    });
+
+    final result = await _savePreferencesUseCase(preferences: preferences);
+
+    switch (result) {
+      case DataSuccess():
+        await OnboardingService.setComplete();
+        state = state.copyWith(
+          isSaving: false,
+          navigation: OnboardingNavigation.success,
+        );
+      case DataFailed():
+        state = state.copyWith(
+          isSaving: false,
+          errorMessage: result.failure.message ??
+              'Não foi possível salvar suas preferências',
+        );
+    }
+  }
+
+  void _showValidationSnackbar() {
+    if (state.isShowingValidationSnackbar) return;
+    state = state.copyWith(isShowingValidationSnackbar: true);
+    Future.delayed(
+      const Duration(seconds: 2),
+      () => state = state.copyWith(isShowingValidationSnackbar: false),
+    );
   }
 }
+
+final onboardingControllerProvider =
+    NotifierProvider<OnboardingNotifier, OnboardingState>(
+  () => OnboardingNotifier(),
+);

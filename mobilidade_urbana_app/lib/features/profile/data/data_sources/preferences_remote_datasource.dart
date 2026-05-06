@@ -2,6 +2,7 @@
 
 import 'package:dio/dio.dart';
 import 'package:mobilidade_urbana_app/core/network/dio_client.dart';
+import 'package:mobilidade_urbana_app/core/services/device_token_service.dart';
 import 'package:mobilidade_urbana_app/features/profile/data/models/preferences_model.dart';
 
 abstract class PreferencesRemoteDatasource {
@@ -17,13 +18,13 @@ class PreferencesRemoteDatasourceImpl implements PreferencesRemoteDatasource {
 
   @override
   Future<PreferencesModel> getPreferences() async {
-    final response = await _dio.get('/preferences');
+    final response = await _dio.get('/preferences/me');
     return PreferencesModel.fromJson(response.data);
   }
 
   @override
   Future<PreferencesModel> updatePreferences(Map<String, dynamic> data) async {
-    final response = await _dio.put('/preferences', data: data);
+    final response = await _dio.put('/preferences/me', data: data);
     return PreferencesModel.fromJson(response.data);
 
   }
@@ -36,7 +37,7 @@ class PreferencesRemoteDatasourceImpl implements PreferencesRemoteDatasource {
 
   @override
   Future<void> deletePreferences() async {
-    await _dio.delete('/preferences');
+    await _dio.delete('/preferences/me');
   }
 
 

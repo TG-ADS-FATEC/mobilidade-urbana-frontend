@@ -1,8 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
-import 'package:mobilidade_urbana_app/features/onboarding/presentation/screens/onboarding_screen.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 import 'package:mobilidade_urbana_app/utils/helpers/helper_functions.dart';
 
@@ -55,7 +54,6 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
               Padding(
                 padding: const EdgeInsets.only(bottom: 24),
                 child: Column(
@@ -67,10 +65,11 @@ class WelcomeScreen extends StatelessWidget {
                         icon: const Icon(Icons.directions_bus),
                         label: const Text('Começar minha jornada'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: dark ? TColors.darkBackground: Colors.black87,
+                          backgroundColor:
+                              dark ? TColors.darkBackground : Colors.black87,
                           foregroundColor: Colors.white,
                         ),
-                        onPressed: () => Get.to(() => const OnboardingScreen()),
+                        onPressed: () => context.go('/onboarding'),
                       ),
                     ),
                     const SizedBox(height: 40),
@@ -93,10 +92,7 @@ class WelcomeScreen extends StatelessWidget {
                               decoration: TextDecoration.underline,
                               fontWeight: FontWeight.w500,
                             ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                // Get.to(() => const TermsScreen());
-                              },
+                            recognizer: TapGestureRecognizer()..onTap = () {},
                           ),
                           const TextSpan(text: ' e '),
                           TextSpan(
@@ -106,10 +102,7 @@ class WelcomeScreen extends StatelessWidget {
                               decoration: TextDecoration.underline,
                               fontWeight: FontWeight.w500,
                             ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                // Get.to(OnboardingScreen());
-                              },
+                            recognizer: TapGestureRecognizer()..onTap = () {},
                           ),
                         ],
                       ),
