@@ -13,7 +13,7 @@ class AuthService {
       final deviceToken = await DeviceTokenService.get();
 
       final response = await dio.post(
-        '/authentication/devices',
+        '/authentication/devices/register',
         data: {
           'deviceToken': deviceToken,
           'appVersion': '1.0.0',
