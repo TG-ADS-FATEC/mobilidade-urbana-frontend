@@ -24,7 +24,7 @@ class PreferencesModel extends PreferencesEntity{
 
   factory PreferencesModel.fromJson(Map<String, dynamic> json) {
     return PreferencesModel(
-      preferenceId: json['preferenceId'] as int? ?? 0,
+      preferenceId: json['preferenceId']?.toString(),
       transportTypes: (json['transportTypes'] as List)
           .map((e) => TransportType.fromJson(e as String))
           .toList(),

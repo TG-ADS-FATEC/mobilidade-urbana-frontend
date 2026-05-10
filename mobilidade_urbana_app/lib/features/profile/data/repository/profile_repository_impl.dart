@@ -51,11 +51,15 @@ class ProfileRepositoryImpl implements ProfileRepository {
     required ProfileEntity profile,
   }) async {
     try {
-      final model = await _remoteDataSource.updateProfile(
+      final model = await _remoteDataSource.saveProfile(
         ProfileModel.fromEntity(profile).toJson(),
       );
       return DataSuccess(model);
     } on DioException catch (e) {
+      if (e.response?.statusCode == 409) {
+        final existing = await _remoteDataSource.getProfile();
+        return DataSuccess(existing);
+      }
       return DataFailed(
           e.type == DioExceptionType.connectionError
               ? NetworkFailure()

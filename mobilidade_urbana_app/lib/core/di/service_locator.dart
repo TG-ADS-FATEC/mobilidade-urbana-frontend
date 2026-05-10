@@ -10,6 +10,7 @@ import 'package:mobilidade_urbana_app/features/profile/domain/usecases/preferenc
 import 'package:mobilidade_urbana_app/features/profile/domain/usecases/preferences/update_preferences_usecase.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/usecases/profile/delete_profile_usecase.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/usecases/profile/get_profile_usecase.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/usecases/profile/save_profile_usecase.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/usecases/profile/update_profile_usecase.dart';
 
 final sl = GetIt.instance;
@@ -24,6 +25,9 @@ Future<void> setupServiceLocator() async {
   );
   sl.registerLazySingleton<GetProfileUseCase>(
     () => GetProfileUseCase(sl()),
+  );
+  sl.registerLazySingleton<SaveProfileUseCase>(
+    () => SaveProfileUseCase(sl()),
   );
   sl.registerLazySingleton<UpdateProfileUseCase>(
     () => UpdateProfileUseCase(sl()),
