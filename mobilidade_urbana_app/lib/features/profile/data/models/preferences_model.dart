@@ -1,4 +1,4 @@
-import 'package:mobilidade_urbana_app/features/profile/domain/entities/preferences.entity.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/entities/preferences_entity.dart';
 
 class PreferencesModel extends PreferencesEntity{
   const PreferencesModel({

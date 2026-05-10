@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobilidade_urbana_app/features/profile/domain/entities/preferences.entity.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/entities/preferences_entity.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/controllers/preferences_controller.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';

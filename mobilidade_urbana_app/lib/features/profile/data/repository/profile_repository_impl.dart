@@ -5,7 +5,7 @@ import 'package:mobilidade_urbana_app/core/error/failures.dart';
 import 'package:mobilidade_urbana_app/core/services/device_token_service.dart';
 import 'package:mobilidade_urbana_app/features/profile/data/data_sources/profile_remote_datasource.dart';
 import 'package:mobilidade_urbana_app/features/profile/data/models/profile_model.dart';
-import 'package:mobilidade_urbana_app/features/profile/domain/entities/profile.entity.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/entities/profile_entity.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/repository/profile_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

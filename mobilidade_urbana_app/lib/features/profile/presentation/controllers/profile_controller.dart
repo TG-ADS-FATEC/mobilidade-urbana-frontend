@@ -3,7 +3,7 @@ import 'package:mobilidade_urbana_app/core/data_state/data_state.dart';
 import 'package:mobilidade_urbana_app/core/di/service_locator.dart';
 import 'package:mobilidade_urbana_app/core/services/device_token_service.dart';
 import 'package:mobilidade_urbana_app/core/services/onboarding_service.dart';
-import 'package:mobilidade_urbana_app/features/profile/domain/entities/profile.entity.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/entities/profile_entity.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/usecases/profile/delete_profile_usecase.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/usecases/profile/get_profile_usecase.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/usecases/profile/update_profile_usecase.dart';

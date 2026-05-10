@@ -1,5 +1,5 @@
 
-import 'package:mobilidade_urbana_app/features/profile/domain/entities/profile.entity.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/entities/profile_entity.dart';
 
 class ProfileModel extends ProfileEntity {
   const ProfileModel({
