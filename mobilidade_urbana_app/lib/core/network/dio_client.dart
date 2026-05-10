@@ -23,7 +23,7 @@ class DioClient {
 
         if (!isPublic) {
           final jwt = await DeviceTokenService.getJwt();
-          if (kDebugMode) debugPrint('[DioClient] JWT: $jwt');
+          // if (kDebugMode) debugPrint('[DioClient] JWT: $jwt');
           if (jwt != null) {
             options.headers['Authorization'] = 'Bearer $jwt';
           }
