@@ -32,7 +32,7 @@ class FavoriteRemoteDataSourceImpl implements FavoriteRemoteDatasource {
 
   @override
   Future<FavoriteModel> updateFavorite(String favoriteId, Map<String, dynamic> data) async {
-    final response = await _dio.put('profiles/favorites/$favoriteId', data: data);
+    final response = await _dio.put('/profiles/favorites/$favoriteId', data: data);
     return FavoriteModel.fromJson(response.data);
   }
 }
