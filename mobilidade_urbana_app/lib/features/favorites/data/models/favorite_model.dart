@@ -7,6 +7,7 @@ class FavoriteModel extends FavoriteEntity {
     super.favoriteId,
     required super.favoriteName,
     super.address,
+    super.createdAt,
   });
 
   factory FavoriteModel.fromEntity(FavoriteEntity entity) {
