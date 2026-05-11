@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobilidade_urbana_app/features/home/presentation/screens/home_screen.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/screens/profile_screen.dart';
+import 'package:mobilidade_urbana_app/features/travel/presentation/travel_screen.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 import 'package:mobilidade_urbana_app/utils/helpers/helper_functions.dart';
 
@@ -38,7 +39,7 @@ class NavigationMenu extends ConsumerWidget {
 
     final screens = [
       HomeScreen(),
-      Container(color: Colors.blue),
+      TravelScreen(),
       Container(color: Colors.red),
       const ProfileScreen(),
     ];
