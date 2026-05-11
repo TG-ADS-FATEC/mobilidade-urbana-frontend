@@ -3,7 +3,6 @@
 import 'package:dio/dio.dart';
 import 'package:mobilidade_urbana_app/core/data_state/data_state.dart';
 import 'package:mobilidade_urbana_app/core/error/failures.dart';
-import 'package:mobilidade_urbana_app/core/services/device_token_service.dart';
 import 'package:mobilidade_urbana_app/features/profile/data/data_sources/preferences_remote_datasource.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/entities/preferences_entity.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/repository/preferences_repository.dart';
@@ -31,15 +30,26 @@ class PreferencesRepositoryImpl implements PreferencesRepository{
   @override
   Future<DataState<PreferencesEntity>> savePreference({required PreferencesEntity preferences}) async {
     try {
-      final deviceToken = await DeviceTokenService.get();
-
-      final json = PreferencesModel.fromEntity(preferences).toJson();
-      json['deviceToken'] = deviceToken;
-
-      final model = await _remoteDataSource.savePreferences(json);
+      final model = await _remoteDataSource.savePreferences(
+        PreferencesModel.fromEntity(preferences).toJson(),
+      );
 
       return DataSuccess(model);
     } on DioException catch (e) {
+      if (e.response?.statusCode == 403 || e.response?.statusCode == 409) {
+        try {
+          final model = await _remoteDataSource.updatePreferences(
+            PreferencesModel.fromEntity(preferences).toJson(),
+          );
+          return DataSuccess(model);
+        } on DioException catch (updateError) {
+          return DataFailed(
+            updateError.type == DioExceptionType.connectionError
+                ? NetworkFailure()
+                : ServerFailure(updateError.message ?? 'Erro ao atualizar preferências'),
+          );
+        }
+      }
       return DataFailed(
           e.type == DioExceptionType.connectionError
               ? NetworkFailure()

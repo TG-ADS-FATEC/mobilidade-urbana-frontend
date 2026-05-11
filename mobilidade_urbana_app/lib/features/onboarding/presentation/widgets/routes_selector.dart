@@ -16,7 +16,7 @@ class OnboardingRouteSelector extends ConsumerWidget {
 
     final routeOptions = [
       (label: 'Mais rápida', icon: Icons.flash_on_outlined, value: RoutePreference.fastest),
-      (label: 'Menos trocas', icon: Icons.swap_horiz, value: RoutePreference.shortest),
+      (label: 'Menos trocas', icon: Icons.swap_horiz, value: RoutePreference.fewerTransfers),
       (label: 'Caminhar menos', icon: Icons.directions_walk_outlined, value: RoutePreference.leastWalking),
     ];
 

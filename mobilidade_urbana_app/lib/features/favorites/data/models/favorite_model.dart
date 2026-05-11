@@ -27,9 +27,7 @@ class FavoriteModel extends FavoriteEntity {
   }
 
   Map<String, dynamic> toJson() => {
-    'favoriteId': favoriteId,
     'favoriteName': favoriteName,
-    'address': address,
   };
 
 

@@ -41,8 +41,6 @@ class PreferencesModel extends PreferencesEntity{
     'routePreference': routePreference.value,
     'slowPace': slowPace,
     'maxWalkingTime': maxWalkingTime,
-    'updatedAt': updatedAt.toIso8601String(),
-    'deviceToken': deviceToken,
   };
 
 
