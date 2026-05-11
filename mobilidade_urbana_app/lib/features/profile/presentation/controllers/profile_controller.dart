@@ -72,6 +72,7 @@ class ProfileNotifier extends Notifier<ProfileState> {
       final updated = state.profile!.copyWith(
         name: updatedProfile.name,
         avatarPath: updatedProfile.avatarPath,
+        email: updatedProfile.email,
       );
       final result = await _updateProfileUseCase(profile: updated);
       switch (result) {
