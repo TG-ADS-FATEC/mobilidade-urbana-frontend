@@ -20,140 +20,140 @@ void main() {
   });
 
   Response<dynamic> _okResponse(Map<String, dynamic> body) => Response(
-        requestOptions: RequestOptions(path: ''),
-        statusCode: 200,
-        data: body,
-      );
+    requestOptions: RequestOptions(path: ''),
+    statusCode: 200,
+    data: body,
+  );
 
   DioException _dioError(DioExceptionType type, {String? message}) =>
-      DioException(
-        requestOptions: RequestOptions(path: ''),
-        type: type,
-        message: message,
-      );
+    DioException(
+      requestOptions: RequestOptions(path: ''),
+      type: type,
+      message: message,
+    );
 
-  group('authenticate() — sucesso', () {
-    test('retorna DataSuccess com o jwt da resposta', () async {
-      when(mockDio.post(any, data: anyNamed('data')))
-          .thenAnswer((_) async => _okResponse({'token': 'fake-jwt-abc'}));
+    group('authenticate() — sucesso', () {
+      test('retorna DataSuccess com o jwt da resposta', () async {
+        when(mockDio.post(any, data: anyNamed('data')))
+            .thenAnswer((_) async => _okResponse({'token': 'fake-jwt-abc'}));
 
-      final result = await AuthService.authenticate(dio: mockDio);
+        final result = await AuthService.authenticate(dio: mockDio);
 
-      expect(result, isA<DataSuccess<List<String>>>());
-      expect((result as DataSuccess<List<String>>).data[0], equals('fake-jwt-abc'));
-    });
-
-    test('salva o jwt no DeviceTokenService após autenticar', () async {
-      when(mockDio.post(any, data: anyNamed('data')))
-          .thenAnswer((_) async => _okResponse({'token': 'stored-jwt'}));
-
-      await AuthService.authenticate(dio: mockDio);
-
-      expect(await DeviceTokenService.getJwt(), equals('stored-jwt'));
-    });
-
-    test('jwt retornado no DataSuccess é o mesmo salvo no storage', () async {
-      when(mockDio.post(any, data: anyNamed('data')))
-          .thenAnswer((_) async => _okResponse({'token': 'consistent-jwt'}));
-
-      final result = await AuthService.authenticate(dio: mockDio);
-      final savedJwt = await DeviceTokenService.getJwt();
-
-      expect((result as DataSuccess<List<String>>).data[0], equals(savedJwt));
-    });
-
-    test('data enviada contém deviceToken, appVersion e platform', () async {
-      Map<String, dynamic>? capturedData;
-
-      when(mockDio.post(any, data: anyNamed('data')))
-          .thenAnswer((invocation) async {
-        capturedData =
-            invocation.namedArguments[#data] as Map<String, dynamic>;
-        return _okResponse({'token': 'jwt'});
+        expect(result, isA<DataSuccess<List<String>>>());
+        expect((result as DataSuccess<List<String>>).data[0], equals('fake-jwt-abc'));
       });
 
-      await AuthService.authenticate(dio: mockDio);
+      test('salva o jwt no DeviceTokenService após autenticar', () async {
+        when(mockDio.post(any, data: anyNamed('data')))
+            .thenAnswer((_) async => _okResponse({'token': 'stored-jwt'}));
 
-      expect(capturedData, isNotNull);
-      expect(capturedData!['deviceToken'], isNotEmpty);
-      expect(capturedData!['appVersion'], equals('1.0.0'));
-      expect(
-        capturedData!['platform'],
-        anyOf(equals('ANDROID'), equals('IOS')),
-      );
-    });
+        await AuthService.authenticate(dio: mockDio);
 
-    test('deviceToken no DataSuccess é o mesmo enviado na requisição', () async {
-      String? sentToken;
-
-      when(mockDio.post(any, data: anyNamed('data')))
-          .thenAnswer((invocation) async {
-        final data =
-            invocation.namedArguments[#data] as Map<String, dynamic>;
-        sentToken = data['deviceToken'] as String;
-        return _okResponse({'token': 'jwt'});
+        expect(await DeviceTokenService.getJwt(), equals('stored-jwt'));
       });
 
-      final result = await AuthService.authenticate(dio: mockDio);
-      final returnedToken = (result as DataSuccess<List<String>>).data[1];
+      test('jwt retornado no DataSuccess é o mesmo salvo no storage', () async {
+        when(mockDio.post(any, data: anyNamed('data')))
+            .thenAnswer((_) async => _okResponse({'token': 'consistent-jwt'}));
 
-      expect(returnedToken, equals(sentToken));
-    });
-  });
+        final result = await AuthService.authenticate(dio: mockDio);
+        final savedJwt = await DeviceTokenService.getJwt();
 
-  group('authenticate() — falhas', () {
-    test('retorna NetworkFailure em connectionError', () async {
-      when(mockDio.post(any, data: anyNamed('data')))
-          .thenThrow(_dioError(DioExceptionType.connectionError));
+        expect((result as DataSuccess<List<String>>).data[0], equals(savedJwt));
+      });
 
-      final result = await AuthService.authenticate(dio: mockDio);
+      test('data enviada contém deviceToken, appVersion e platform', () async {
+        Map<String, dynamic>? capturedData;
 
-      expect(result, isA<DataFailed>());
-      expect((result as DataFailed).failure, isA<NetworkFailure>());
-    });
+        when(mockDio.post(any, data: anyNamed('data')))
+            .thenAnswer((invocation) async {
+          capturedData =
+              invocation.namedArguments[#data] as Map<String, dynamic>;
+          return _okResponse({'token': 'jwt'});
+        });
 
-    test('retorna ServerFailure em badResponse (5xx)', () async {
-      when(mockDio.post(any, data: anyNamed('data')))
-          .thenThrow(_dioError(
-        DioExceptionType.badResponse,
-        message: 'Internal Server Error',
-      ));
+        await AuthService.authenticate(dio: mockDio);
 
-      final result = await AuthService.authenticate(dio: mockDio);
+        expect(capturedData, isNotNull);
+        expect(capturedData!['deviceToken'], isNotEmpty);
+        expect(capturedData!['appVersion'], equals('1.0.0'));
+        expect(
+          capturedData!['platform'],
+          anyOf(equals('ANDROID'), equals('IOS')),
+        );
+      });
 
-      expect(result, isA<DataFailed>());
-      expect((result as DataFailed).failure, isA<ServerFailure>());
-    });
+      test('deviceToken no DataSuccess é o mesmo enviado na requisição', () async {
+        String? sentToken;
 
-    test('mensagem da ServerFailure vem do DioException.message', () async {
-      when(mockDio.post(any, data: anyNamed('data')))
-          .thenThrow(_dioError(
-        DioExceptionType.badResponse,
-        message: 'Service unavailable',
-      ));
+        when(mockDio.post(any, data: anyNamed('data')))
+            .thenAnswer((invocation) async {
+          final data =
+              invocation.namedArguments[#data] as Map<String, dynamic>;
+          sentToken = data['deviceToken'] as String;
+          return _okResponse({'token': 'jwt'});
+        });
 
-      final result = await AuthService.authenticate(dio: mockDio);
+        final result = await AuthService.authenticate(dio: mockDio);
+        final returnedToken = (result as DataSuccess<List<String>>).data[1];
 
-      expect((result as DataFailed).failure.message, equals('Service unavailable'));
-    });
-
-    test('retorna ServerFailure com mensagem padrão quando message é null', () async {
-      when(mockDio.post(any, data: anyNamed('data')))
-          .thenThrow(_dioError(DioExceptionType.badResponse));
-
-      final result = await AuthService.authenticate(dio: mockDio);
-
-      expect((result as DataFailed).failure, isA<ServerFailure>());
-      expect((result as DataFailed).failure.message, equals('Falha na autenticação'));
+        expect(returnedToken, equals(sentToken));
+      });
     });
 
-    test('não salva jwt no storage quando falha', () async {
-      when(mockDio.post(any, data: anyNamed('data')))
-          .thenThrow(_dioError(DioExceptionType.connectionError));
+    group('authenticate() — falhas', () {
+      test('retorna NetworkFailure em connectionError', () async {
+        when(mockDio.post(any, data: anyNamed('data')))
+            .thenThrow(_dioError(DioExceptionType.connectionError));
 
-      await AuthService.authenticate(dio: mockDio);
+        final result = await AuthService.authenticate(dio: mockDio);
 
-      expect(await DeviceTokenService.getJwt(), isNull);
+        expect(result, isA<DataFailed>());
+        expect((result as DataFailed).failure, isA<NetworkFailure>());
+      });
+
+      test('retorna ServerFailure em badResponse (5xx)', () async {
+        when(mockDio.post(any, data: anyNamed('data')))
+            .thenThrow(_dioError(
+          DioExceptionType.badResponse,
+          message: 'Internal Server Error',
+        ));
+
+        final result = await AuthService.authenticate(dio: mockDio);
+
+        expect(result, isA<DataFailed>());
+        expect((result as DataFailed).failure, isA<ServerFailure>());
+      });
+
+      test('mensagem da ServerFailure vem do DioException.message', () async {
+        when(mockDio.post(any, data: anyNamed('data')))
+            .thenThrow(_dioError(
+          DioExceptionType.badResponse,
+          message: 'Service unavailable',
+        ));
+
+        final result = await AuthService.authenticate(dio: mockDio);
+
+        expect((result as DataFailed).failure.message, equals('Service unavailable'));
+      });
+
+      test('retorna ServerFailure com mensagem padrão quando message é null', () async {
+        when(mockDio.post(any, data: anyNamed('data')))
+            .thenThrow(_dioError(DioExceptionType.badResponse));
+
+        final result = await AuthService.authenticate(dio: mockDio);
+
+        expect((result as DataFailed).failure, isA<ServerFailure>());
+        expect((result as DataFailed).failure.message, equals('Falha na autenticação'));
+      });
+
+      test('não salva jwt no storage quando falha', () async {
+        when(mockDio.post(any, data: anyNamed('data')))
+            .thenThrow(_dioError(DioExceptionType.connectionError));
+
+        await AuthService.authenticate(dio: mockDio);
+
+        expect(await DeviceTokenService.getJwt(), isNull);
+      });
     });
-  });
 }
