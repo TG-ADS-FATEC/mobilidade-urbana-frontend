@@ -19,7 +19,8 @@ class DioClient {
 
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        final isPublic = _publicRoutes.contains(options.path);
+        final isPublic =
+            _publicRoutes.any((route) => options.path.startsWith(route));
 
         if (!isPublic) {
           final jwt = await DeviceTokenService.getJwt();
