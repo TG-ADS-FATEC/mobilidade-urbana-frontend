@@ -96,8 +96,8 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                 ),
       floatingActionButton: FloatingActionButton(
         onPressed: _openAddSheet,
-        backgroundColor: TColors.primary,
-        child: const Icon(Icons.add, color: TColors.white),
+        backgroundColor: TColors.soothingLime,
+        child: const Icon(Icons.add, color: TColors.black),
       ),
     );
   }
@@ -138,7 +138,7 @@ class _EmptyState extends StatelessWidget {
             icon: const Icon(Icons.add),
             label: const Text('Adicionar favorito'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: TColors.primary,
+              backgroundColor: TColors.black,
               foregroundColor: TColors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(TSizes.buttonRadius),
