@@ -44,24 +44,26 @@ class FavoritesSection extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Favoritos',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
                 Row(
                   children: [
+                    Text(
+                      'Favoritos',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                     IconButton(
                       onPressed: () => _openAddSheet(context),
                       icon: const Icon(Icons.add_circle_outline),
                       tooltip: 'Novo favorito',
                       visualDensity: VisualDensity.compact,
-                      color: TColors.primary,
                     ),
+                  ],
+                ),
+                Row(
+                  children: [
                     TextButton(
                       onPressed: () => _openFavoritesScreen(context),
                       style: TextButton.styleFrom(
                         visualDensity: VisualDensity.compact,
-                        foregroundColor: TColors.primary,
                       ),
                       child: const Row(
                         children: [
@@ -131,12 +133,14 @@ class _EmptySection extends StatelessWidget {
           ),
           const SizedBox(height: TSizes.sm),
           FilledButton.icon(
+
             onPressed: onAdd,
             icon: const Icon(Icons.add, size: 16),
             label: const Text('Adicionar favorito'),
             style: FilledButton.styleFrom(
               backgroundColor: TColors.soothingLime,
               foregroundColor: TColors.textPrimary,
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(TSizes.buttonRadius),
               ),
@@ -183,9 +187,9 @@ class _FavoriteCard extends StatelessWidget {
                   color: isDark ? TColors.darkBackground : TColors.lightGrey,
                   borderRadius: BorderRadius.circular(TSizes.cardRadiusMd),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.star_rounded,
-                  color: TColors.primary,
+                  color: isDark ? TColors.light : TColors.dark,
                   size: 22,
                 ),
               ),
