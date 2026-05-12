@@ -104,7 +104,7 @@ class _NavigationMenuState extends ConsumerState<NavigationMenu> {
               onDestinationSelected: notifier.onTabChanged,
               backgroundColor:
                   isDarkMode ? TColors.darkBackground : TColors.light,
-              indicatorColor: TColors.soothingLime,
+              indicatorColor: isDarkMode ? TColors.darkGrey : TColors.soothingLime,
               destinations: const [
                 NavigationDestination(
                   icon: Icon(Icons.home_outlined),
