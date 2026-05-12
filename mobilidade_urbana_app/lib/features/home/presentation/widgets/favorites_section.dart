@@ -4,6 +4,8 @@ import 'package:mobilidade_urbana_app/features/favorites/domain/entities/favorit
 import 'package:mobilidade_urbana_app/features/favorites/presentation/controllers/favorite_controller.dart';
 import 'package:mobilidade_urbana_app/features/favorites/presentation/screens/favorites_screen.dart';
 import 'package:mobilidade_urbana_app/features/favorites/presentation/widgets/favorite_form_bottom_sheet.dart';
+import 'package:mobilidade_urbana_app/features/travel/presentation/controllers/travel_controller.dart';
+import 'package:mobilidade_urbana_app/navigation_menu.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
 
@@ -39,7 +41,6 @@ class FavoritesSection extends ConsumerWidget {
         padding: EdgeInsetsGeometry.symmetric(horizontal: TSizes.xs),
         child: Column(
           children: [
-            // Cabeçalho com botão "+" e "Ver todos"
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -54,20 +55,19 @@ class FavoritesSection extends ConsumerWidget {
                       icon: const Icon(Icons.add_circle_outline),
                       tooltip: 'Novo favorito',
                       visualDensity: VisualDensity.compact,
+                      color: TColors.primary,
                     ),
                     TextButton(
                       onPressed: () => _openFavoritesScreen(context),
                       style: TextButton.styleFrom(
                         visualDensity: VisualDensity.compact,
+                        foregroundColor: TColors.primary,
                       ),
-                      child: Row(
+                      child: const Row(
                         children: [
-                          Text(
-                            'Ver todos',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                          const SizedBox(width: 2),
-                          const Icon(Icons.keyboard_arrow_right, size: 16),
+                          Text('Ver todos'),
+                          SizedBox(width: 2),
+                          Icon(Icons.keyboard_arrow_right, size: 16),
                         ],
                       ),
                     ),
@@ -80,7 +80,7 @@ class FavoritesSection extends ConsumerWidget {
             if (favState.isLoading)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: TSizes.lg),
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(color: TColors.primary),
               )
             else if (top3.isEmpty)
               _EmptySection(onAdd: () => _openAddSheet(context))
@@ -90,6 +90,10 @@ class FavoritesSection extends ConsumerWidget {
                   favorite: fav,
                   isDark: isDark,
                   onTap: () {
+                    ref.read(travelDestinationProvider.notifier).state = fav;
+                    ref
+                        .read(navigationMenuProvider.notifier)
+                        .onTabChanged(1);
                     if (fav.favoriteId != null) {
                       ref
                           .read(favoriteControllerProvider.notifier)
@@ -123,16 +127,16 @@ class _EmptySection extends StatelessWidget {
             style: Theme.of(context)
                 .textTheme
                 .bodySmall
-                ?.copyWith(color: Colors.grey),
+                ?.copyWith(color: TColors.grey),
           ),
-          const SizedBox(height: TSizes.xs),
-          OutlinedButton.icon(
+          const SizedBox(height: TSizes.sm),
+          FilledButton.icon(
             onPressed: onAdd,
             icon: const Icon(Icons.add, size: 16),
             label: const Text('Adicionar favorito'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: TColors.primary,
-              side: const BorderSide(color: TColors.primary),
+            style: FilledButton.styleFrom(
+              backgroundColor: TColors.soothingLime,
+              foregroundColor: TColors.textPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(TSizes.buttonRadius),
               ),
@@ -161,23 +165,23 @@ class _FavoriteCard extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: TSizes.xs),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(TSizes.cardRadiusMd),
+        borderRadius: BorderRadius.circular(TSizes.cardRadiusLg),
         child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: TSizes.sm,
             vertical: 12,
           ),
           decoration: BoxDecoration(
-            color: isDark ? Colors.grey[850] : Colors.grey[100],
-            borderRadius: BorderRadius.circular(TSizes.cardRadiusMd),
+            color: isDark ? TColors.darkSurface : TColors.surface,
+            borderRadius: BorderRadius.circular(TSizes.cardRadiusLg),
           ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.grey[800] : Colors.white,
-                  borderRadius: BorderRadius.circular(TSizes.cardRadiusSm),
+                  color: isDark ? TColors.darkBackground : TColors.lightGrey,
+                  borderRadius: BorderRadius.circular(TSizes.cardRadiusMd),
                 ),
                 child: const Icon(
                   Icons.star_rounded,
@@ -203,14 +207,14 @@ class _FavoriteCard extends StatelessWidget {
                         style: Theme.of(context)
                             .textTheme
                             .bodySmall
-                            ?.copyWith(color: Colors.grey),
+                            ?.copyWith(color: TColors.grey),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded, color: Colors.grey),
+              const Icon(Icons.chevron_right_rounded, color: TColors.grey),
             ],
           ),
         ),
