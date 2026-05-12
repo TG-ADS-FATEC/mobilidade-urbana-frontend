@@ -251,7 +251,7 @@ class _RecenterButton extends StatelessWidget {
                 padding: EdgeInsets.all(12),
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
-            : const Icon(Icons.my_location, size: 20, color: TColors.primary),
+            : const Icon(Icons.my_location, size: 20, color: Colors.black87),
       ),
     );
   }
