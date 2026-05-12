@@ -21,27 +21,43 @@ class ProfileTransportSelector extends ConsumerWidget {
       (label: 'Metrô', icon: Icons.subway_outlined, type: TransportType.subway),
     ];
 
+    final isLastSelected = current.transportTypes.length == 1;
+
     return Column(
       children: transports.map((transport) {
         final isEnabled = current.transportTypes.contains(transport.type);
+        final isDisabled = isEnabled && isLastSelected;
 
         return SwitchListTile(
           value: isEnabled,
-          onChanged: (value) {
-            final updated = List<TransportType>.from(current.transportTypes);
-            if (value) {
-              updated.add(transport.type);
-            } else {
-              updated.remove(transport.type);
-            }
-            notifier.updatePreferences(
-              current.copyWith(transportTypes: updated),
-            );
-          },
-          secondary: Icon(transport.icon),
-          title: Text(transport.label),
+          onChanged: isDisabled
+              ? null
+              : (value) {
+                  final updated =
+                      List<TransportType>.from(current.transportTypes);
+                  if (value) {
+                    updated.add(transport.type);
+                  } else {
+                    updated.remove(transport.type);
+                  }
+                  notifier.updatePreferences(
+                    current.copyWith(transportTypes: updated),
+                  );
+                },
+          secondary: Icon(
+            transport.icon,
+            color: isDisabled
+                ? Theme.of(context).disabledColor
+                : null,
+          ),
+          title: Text(
+            transport.label,
+            style: isDisabled
+                ? TextStyle(color: Theme.of(context).disabledColor)
+                : null,
+          ),
           contentPadding: EdgeInsets.zero,
-          activeColor: TColors.white,
+          activeThumbColor: TColors.white,
           activeTrackColor: TColors.primary,
           inactiveThumbColor: Theme.of(context).colorScheme.outline,
           inactiveTrackColor: Colors.transparent,
