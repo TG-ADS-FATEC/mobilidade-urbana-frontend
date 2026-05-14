@@ -18,8 +18,8 @@ enum TransportType {
 
 enum RoutePreference {
   fastest('FASTEST'),
-  shortest('SHORTEST'),
-  leastWalking('LEAST_WALKING');
+  fewerTransfers('FEWER_TRANSFERS'),
+  leastWalking('LESS_WALKING');
 
   final String value;
   const RoutePreference(this.value);

@@ -5,7 +5,7 @@ import 'package:mobilidade_urbana_app/core/services/device_token_service.dart';
 import 'package:mobilidade_urbana_app/core/services/onboarding_service.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/data/data_sources/onboarding_remote_datasource.dart';
 import 'package:mobilidade_urbana_app/features/profile/data/models/preferences_model.dart';
-import 'package:mobilidade_urbana_app/features/profile/domain/entities/preferences.entity.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/entities/preferences_entity.dart';
 
 class OnboardingRepositoryImpl  {
   final OnboardingRemoteDatasource _remoteDataSource;

@@ -1,4 +1,11 @@
 import 'package:get_it/get_it.dart';
+import 'package:mobilidade_urbana_app/features/favorites/data/data_sources/favorite_remote_datasource.dart';
+import 'package:mobilidade_urbana_app/features/favorites/data/repository/favorite_repository_impl.dart';
+import 'package:mobilidade_urbana_app/features/favorites/domain/repository/favorite_repository.dart';
+import 'package:mobilidade_urbana_app/features/favorites/domain/usecases/add_favorites_usecase.dart';
+import 'package:mobilidade_urbana_app/features/favorites/domain/usecases/delete_favorite_usecase.dart';
+import 'package:mobilidade_urbana_app/features/favorites/domain/usecases/get_favorites_usecase.dart';
+import 'package:mobilidade_urbana_app/features/favorites/domain/usecases/update_favorite_usecase.dart';
 import 'package:mobilidade_urbana_app/features/profile/data/data_sources/preferences_remote_datasource.dart';
 import 'package:mobilidade_urbana_app/features/profile/data/data_sources/profile_remote_datasource.dart';
 import 'package:mobilidade_urbana_app/features/profile/data/repository/preferences_repository_impl.dart';
@@ -10,6 +17,7 @@ import 'package:mobilidade_urbana_app/features/profile/domain/usecases/preferenc
 import 'package:mobilidade_urbana_app/features/profile/domain/usecases/preferences/update_preferences_usecase.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/usecases/profile/delete_profile_usecase.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/usecases/profile/get_profile_usecase.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/usecases/profile/save_profile_usecase.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/usecases/profile/update_profile_usecase.dart';
 
 final sl = GetIt.instance;
@@ -24,6 +32,9 @@ Future<void> setupServiceLocator() async {
   );
   sl.registerLazySingleton<GetProfileUseCase>(
     () => GetProfileUseCase(sl()),
+  );
+  sl.registerLazySingleton<SaveProfileUseCase>(
+    () => SaveProfileUseCase(sl()),
   );
   sl.registerLazySingleton<UpdateProfileUseCase>(
     () => UpdateProfileUseCase(sl()),
@@ -48,4 +59,25 @@ Future<void> setupServiceLocator() async {
   sl.registerLazySingleton<SavePreferencesUseCase>(
     () => SavePreferencesUseCase(sl()),
   );
+
+  // ---- Favoritos ----
+  sl.registerLazySingleton<FavoriteRemoteDatasource>(
+      () => FavoriteRemoteDataSourceImpl(),
+  );
+  sl.registerLazySingleton<FavoriteRepository>(
+        () => FavoriteRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton<GetFavoritesUsecase>(
+        () => GetFavoritesUsecase(sl()),
+  );
+  sl.registerLazySingleton<AddFavoritesUsecase>(
+        () => AddFavoritesUsecase(sl()),
+  );
+  sl.registerLazySingleton<UpdateFavoriteUsecase>(
+        () => UpdateFavoriteUsecase(sl()),
+  );
+  sl.registerLazySingleton<DeleteFavoriteUsecase>(
+        () => DeleteFavoriteUsecase(sl()),
+  );
+
 }

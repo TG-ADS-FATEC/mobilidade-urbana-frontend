@@ -5,7 +5,7 @@ import 'package:mobilidade_urbana_app/core/error/failures.dart';
 import 'package:mobilidade_urbana_app/core/services/device_token_service.dart';
 import 'package:mobilidade_urbana_app/features/profile/data/data_sources/profile_remote_datasource.dart';
 import 'package:mobilidade_urbana_app/features/profile/data/models/profile_model.dart';
-import 'package:mobilidade_urbana_app/features/profile/domain/entities/profile.entity.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/entities/profile_entity.dart';
 import 'package:mobilidade_urbana_app/features/profile/domain/repository/profile_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -51,11 +51,15 @@ class ProfileRepositoryImpl implements ProfileRepository {
     required ProfileEntity profile,
   }) async {
     try {
-      final model = await _remoteDataSource.updateProfile(
+      final model = await _remoteDataSource.saveProfile(
         ProfileModel.fromEntity(profile).toJson(),
       );
       return DataSuccess(model);
     } on DioException catch (e) {
+      if (e.response?.statusCode == 409) {
+        final existing = await _remoteDataSource.getProfile();
+        return DataSuccess(existing);
+      }
       return DataFailed(
           e.type == DioExceptionType.connectionError
               ? NetworkFailure()

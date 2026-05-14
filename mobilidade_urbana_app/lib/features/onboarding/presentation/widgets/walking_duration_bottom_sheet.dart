@@ -39,7 +39,7 @@ class _WalkingDurationContent extends ConsumerWidget {
           children: [
             Text(
               'Duração máxima da caminhada',
-              style: Theme.of(context).textTheme.titleLarge,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: TSizes.spaceBtwItems),
             Text(

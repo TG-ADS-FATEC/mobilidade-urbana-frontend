@@ -1,4 +1,4 @@
-import 'package:mobilidade_urbana_app/features/profile/domain/entities/preferences.entity.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/entities/preferences_entity.dart';
 
 class PreferencesModel extends PreferencesEntity{
   const PreferencesModel({
@@ -24,7 +24,7 @@ class PreferencesModel extends PreferencesEntity{
 
   factory PreferencesModel.fromJson(Map<String, dynamic> json) {
     return PreferencesModel(
-      preferenceId: json['preferenceId'] as int? ?? 0,
+      preferenceId: json['preferenceId']?.toString(),
       transportTypes: (json['transportTypes'] as List)
           .map((e) => TransportType.fromJson(e as String))
           .toList(),
@@ -41,8 +41,6 @@ class PreferencesModel extends PreferencesEntity{
     'routePreference': routePreference.value,
     'slowPace': slowPace,
     'maxWalkingTime': maxWalkingTime,
-    'updatedAt': updatedAt.toIso8601String(),
-    'deviceToken': deviceToken,
   };
 
 

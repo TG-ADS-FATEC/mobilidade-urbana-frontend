@@ -15,20 +15,20 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
 
   @override
   Future<ProfileModel> getProfile() async {
-    final response = await _dio.get('/profile');
+    final response = await _dio.get('/profiles/me');
     return ProfileModel.fromJson(response.data);
   }
 
   @override
   Future<ProfileModel> updateProfile(Map<String, dynamic> data) async {
-    final response = await _dio.put('/profile', data: data);
+    final response = await _dio.put('/profiles/me', data: data);
     return ProfileModel.fromJson(response.data);
 
   }
 
   @override
   Future<ProfileModel> saveProfile(Map<String, dynamic> data) async {
-    final response = await _dio.post('/profile', data: data);
+    final response = await _dio.post('/profiles', data: data);
     return ProfileModel.fromJson(response.data);
   }
 

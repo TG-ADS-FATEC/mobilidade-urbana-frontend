@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobilidade_urbana_app/features/profile/domain/entities/preferences.entity.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/entities/preferences_entity.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/controllers/preferences_controller.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
@@ -21,7 +21,23 @@ class ProfileWalkingOptions extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        _WalkingDurationSection(
+          duration: current.maxWalkingTime.toDouble(),
+          onTap: () => _showDurationPicker(context, notifier, current),
+        ),
         const SizedBox(height: TSizes.spaceBtwSections),
+        Text(
+          'Velocidade de caminhada',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Duplica o tempo para cada seção de caminhada de sua viagem',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+        ),
+        const SizedBox(height: TSizes.spaceBtwItems),
         _WalkingPaceSwitch(
           isDark: isDark,
           value: current.slowPace,
@@ -30,10 +46,7 @@ class ProfileWalkingOptions extends ConsumerWidget {
           },
         ),
         const SizedBox(height: TSizes.spaceBtwSections),
-        _WalkingDurationSection(
-          duration: current.maxWalkingTime.toDouble(),
-          onTap: () => _showDurationPicker(context, notifier, current),
-        ),
+
       ],
     );
   }
@@ -107,12 +120,14 @@ class _WalkingDurationSection extends StatelessWidget {
       children: [
         Text(
           'Duração da caminhada',
-          style: Theme.of(context).textTheme.titleLarge,
+          style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: TSizes.spaceBtwItems / 2),
         Text(
           'Define o máximo de minutos para cada seção de caminhada da sua viagem',
-          style: Theme.of(context).textTheme.bodyMedium,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
         ),
         const SizedBox(height: TSizes.spaceBtwItems),
         Row(
@@ -176,7 +191,7 @@ class _WalkingDurationBottomSheetState
         children: [
           Text(
             'Duração máxima de caminhada',
-            style: Theme.of(context).textTheme.titleLarge,
+            style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 16),
           Text(
@@ -199,6 +214,14 @@ class _WalkingDurationBottomSheetState
                 widget.onConfirm(_value.toInt());
                 Navigator.pop(context);
               },
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.all(
+                  Theme.of(context).brightness == Brightness.dark
+                      ? TColors.soothingLime.withOpacity(0.85)
+                      : TColors.soothingLime,
+                ),
+                foregroundColor: WidgetStateProperty.all(TColors.textPrimary),
+              ),
               child: const Text('Confirmar'),
             ),
           ),

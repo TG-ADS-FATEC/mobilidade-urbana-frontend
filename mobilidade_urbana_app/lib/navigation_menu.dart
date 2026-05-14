@@ -2,8 +2,10 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobilidade_urbana_app/core/services/permission_service.dart';
 import 'package:mobilidade_urbana_app/features/home/presentation/screens/home_screen.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/screens/profile_screen.dart';
+import 'package:mobilidade_urbana_app/features/travel/presentation/travel_screen.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 import 'package:mobilidade_urbana_app/utils/helpers/helper_functions.dart';
 
@@ -22,23 +24,36 @@ class _NavigationNotifier extends Notifier<_NavigationState> {
       state = state.copyWith(selectedIndex: index);
 }
 
-final _navigationProvider =
+final navigationMenuProvider =
     NotifierProvider<_NavigationNotifier, _NavigationState>(
   () => _NavigationNotifier(),
 );
 
-class NavigationMenu extends ConsumerWidget {
+class NavigationMenu extends ConsumerStatefulWidget {
   const NavigationMenu({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(_navigationProvider);
-    final notifier = ref.read(_navigationProvider.notifier);
+  ConsumerState<NavigationMenu> createState() => _NavigationMenuState();
+}
+
+class _NavigationMenuState extends ConsumerState<NavigationMenu> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) PermissionService.requestOnFirstLaunch(context);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(navigationMenuProvider);
+    final notifier = ref.read(navigationMenuProvider.notifier);
     final isDarkMode = THelperFunctions.isDarkMode(context);
 
     final screens = [
       HomeScreen(),
-      Container(color: Colors.blue),
+      TravelScreen(onBack: () => notifier.onTabChanged(0)),
       Container(color: Colors.red),
       const ProfileScreen(),
     ];
@@ -89,14 +104,12 @@ class NavigationMenu extends ConsumerWidget {
               onDestinationSelected: notifier.onTabChanged,
               backgroundColor:
                   isDarkMode ? TColors.darkBackground : TColors.light,
-              indicatorColor: isDarkMode
-                  ? TColors.white.withValues(alpha: 0.1)
-                  : TColors.black.withValues(alpha: 0.1),
+              indicatorColor: isDarkMode ? TColors.darkGrey : TColors.soothingLime,
               destinations: const [
                 NavigationDestination(
                   icon: Icon(Icons.home_outlined),
                   selectedIcon: Icon(Icons.home),
-                  label: 'Home',
+                  label: 'Início',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.directions_bus_outlined),
@@ -104,14 +117,14 @@ class NavigationMenu extends ConsumerWidget {
                   label: 'Ir',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.merge_outlined),
-                  selectedIcon: Icon(Icons.merge),
-                  label: 'Linhas',
+                  icon: Icon(Icons.more_horiz),
+                  selectedIcon: Icon(Icons.more_horiz),
+                  label: 'linhas',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.account_circle_outlined),
-                  selectedIcon: Icon(Icons.account_circle),
-                  label: 'Perfil',
+                  icon: Icon(Icons.person_outline),
+                  selectedIcon: Icon(Icons.person),
+                  label: 'Conta',
                 ),
               ],
             ),

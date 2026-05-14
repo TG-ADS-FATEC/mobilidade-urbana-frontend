@@ -22,7 +22,7 @@ class EditProfileScreen extends ConsumerWidget {
               title: const Text('Editar Perfil'),
               showBackArrow: true,
               actions: [
-                if (state.isLoading)
+                if (state.isLoading && state.preferences != null)
                   const Padding(
                     padding: EdgeInsets.only(right: 16),
                     child: SizedBox(
@@ -44,20 +44,71 @@ class EditProfileScreen extends ConsumerWidget {
                   ),
               ],
             ),
-            Padding(
-              padding: EdgeInsetsGeometry.symmetric(
-                horizontal: TSizes.xs,
-                vertical: TSizes.sm,
+            if (state.isLoading && state.preferences == null)
+              const Padding(
+                padding: EdgeInsets.only(top: 80),
+                child: CircularProgressIndicator(),
+              )
+            else if (state.preferences == null)
+              Padding(
+                padding: const EdgeInsets.only(top: 80),
+                child: Column(
+                  children: [
+                    const Icon(Icons.cloud_off_outlined,
+                        size: 48, color: Colors.grey),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Não foi possível carregar as preferências',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(color: Colors.grey),
+                    ),
+                    const SizedBox(height: 16),
+                    TextButton.icon(
+                      onPressed: () => ref
+                          .read(preferencesControllerProvider.notifier)
+                          .loadPreferences(),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Tentar novamente'),
+                    ),
+                  ],
+                ),
+              )
+            else
+              Padding(
+                padding: EdgeInsetsGeometry.symmetric(
+                  horizontal: TSizes.sm,
+                  vertical: TSizes.sm,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: TSizes.spaceBtwSections),
+                    Text(
+                      'Preferências de rota',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: TSizes.spaceBtwItems),
+                    const ProfileRouteSelector(),
+                    const SizedBox(height: TSizes.spaceBtwSections),
+                    Text(
+                      'Modos de transporte',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Os tipos selecionados terão prioridade mais alta no trajeto sugerido',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                    const ProfileTransportSelector(),
+                    const SizedBox(height: TSizes.spaceBtwSections),
+                    const ProfileWalkingOptions(),
+                  ],
+                ),
               ),
-              child: const Column(
-                children: [
-                  SizedBox(height: 40),
-                  ProfileRouteSelector(),
-                  ProfileTransportSelector(),
-                  ProfileWalkingOptions(),
-                ],
-              ),
-            ),
           ],
         ),
       ),

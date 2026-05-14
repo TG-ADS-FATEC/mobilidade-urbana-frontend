@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:mobilidade_urbana_app/features/favorites/presentation/screens/favorites_screen.dart';
 import 'package:mobilidade_urbana_app/features/home/presentation/screens/home_screen.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/presentation/screens/success_screen.dart';
@@ -34,6 +35,10 @@ class AppRouter {
           GoRoute(
             path: '/profile/edit-profile',
             builder: (context, state) => const EditProfileScreen(),
+          ),
+          GoRoute(
+            path: '/favorites',
+            builder: (context, state) => const FavoritesScreen(),
           ),
         ],
       );

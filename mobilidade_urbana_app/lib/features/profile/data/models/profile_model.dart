@@ -1,33 +1,33 @@
 
-import 'package:mobilidade_urbana_app/features/profile/domain/entities/profile.entity.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/entities/profile_entity.dart';
 
 class ProfileModel extends ProfileEntity {
   const ProfileModel({
-    required super.id,
-    required super.deviceToken,
+    required super.deviceId ,
+    super.email,
     super.name,
     super.avatarPath,
     required super.createdAt,
     required super.updatedAt,
-    required super.preferenceId,
+    super.preferenceId,
   });
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
     return ProfileModel(
-      id: json['id']?.toString() ?? '',
-      deviceToken: json['deviceToken']?.toString() ?? '',
+      deviceId : json['deviceId']?.toString() ?? '',
+      email: json['email'] as String?,
       name: json['name'] as String?,
       avatarPath: json['avatarPath'] as String?,
       createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
       updatedAt: DateTime.tryParse(json['updatedAt'] ?? '') ?? DateTime.now(),
-      preferenceId: json['preferenceId']?.toString() ?? '',
+      preferenceId: json['preferenceId']?.toString(),
     );
   }
 
   factory ProfileModel.fromEntity(ProfileEntity entity) {
     return ProfileModel(
-      id: entity.id,
-      deviceToken: entity.deviceToken,
+      deviceId : entity.deviceId ,
+      email: entity.email,
       name: entity.name,
       avatarPath: entity.avatarPath,
       createdAt: entity.createdAt,
@@ -39,5 +39,6 @@ class ProfileModel extends ProfileEntity {
   Map<String, dynamic> toJson() => {
     'name': name,
     'avatarPath': avatarPath,
+    'email': email,
   };
 }
