@@ -6,6 +6,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mobilidade_urbana_app/features/favorites/domain/entities/favorite_entity.dart';
 import 'package:mobilidade_urbana_app/features/travel/presentation/controllers/travel_controller.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/entities/preferences_entity.dart';
+import 'package:mobilidade_urbana_app/features/travel/presentation/widgets/travel_preferences_bottom_sheet.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 
 class TravelScreen extends ConsumerStatefulWidget {
@@ -338,6 +340,7 @@ class _TravelScreenState extends ConsumerState<TravelScreen> {
               canFindRoute: _userLocation != null && _destinationLatLng != null,
               onSwap: _swapAddresses,
               onFindRoute: _fetchRoute,
+              onPreferences: () => showTravelPreferencesSheet(context),
             ),
           ),
         ],
@@ -442,6 +445,7 @@ class _RoutePanel extends StatelessWidget {
   final bool canFindRoute;
   final VoidCallback onSwap;
   final VoidCallback onFindRoute;
+  final VoidCallback onPreferences;
 
   const _RoutePanel({
     required this.originAddress,
@@ -451,6 +455,7 @@ class _RoutePanel extends StatelessWidget {
     required this.canFindRoute,
     required this.onSwap,
     required this.onFindRoute,
+    required this.onPreferences,
   });
 
   @override
@@ -499,7 +504,7 @@ class _RoutePanel extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                _PreferencesButton(isDark: isDark),
+                _PreferencesButton(isDark: isDark, onTap: onPreferences),
                 const SizedBox(height: 16),
                 _SearchCard(
                   isDark: isDark,
@@ -523,37 +528,49 @@ class _RoutePanel extends StatelessWidget {
   }
 }
 
-class _PreferencesButton extends StatelessWidget {
+class _PreferencesButton extends ConsumerWidget {
   final bool isDark;
-  const _PreferencesButton({required this.isDark});
+  final VoidCallback onTap;
+  const _PreferencesButton({required this.isDark, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.15)
-              : Colors.black.withValues(alpha: 0.15),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final prefs = ref.watch(travelPreferencesProvider);
+
+    final labels = {
+      RoutePreference.fastest: 'Mais rápida',
+      RoutePreference.fewerTransfers: 'Menos trocas',
+      RoutePreference.leastWalking: 'Caminhar menos',
+    };
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.15)
+                : Colors.black.withValues(alpha: 0.15),
+          ),
+          borderRadius: BorderRadius.circular(12),
         ),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Preferências de trajeto',
-            style: TextStyle(
-              fontSize: 15,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              labels[prefs.routePreference] ?? 'Preferências de trajeto',
+              style: TextStyle(
+                fontSize: 15,
+                color: isDark ? TColors.darkTextSecondary : TColors.textSecondary,
+              ),
+            ),
+            Icon(
+              Icons.keyboard_arrow_down,
               color: isDark ? TColors.darkTextSecondary : TColors.textSecondary,
             ),
-          ),
-          Icon(
-            Icons.keyboard_arrow_down,
-            color: isDark ? TColors.darkTextSecondary : TColors.textSecondary,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

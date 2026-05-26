@@ -151,7 +151,7 @@ class _SearchBar extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: TSizes.md,
+        horizontal: TSizes.sm,
         vertical: TSizes.xs,
       ),
       child: Container(
