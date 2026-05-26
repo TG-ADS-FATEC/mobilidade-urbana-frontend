@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobilidade_urbana_app/features/lines/presentation/screens/lines_screen.dart';
+import 'package:mobilidade_urbana_app/features/lines/data/transit_line.dart';
+import 'package:mobilidade_urbana_app/features/lines/presentation/widgets/line_widgets.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
 
@@ -41,9 +42,9 @@ class _NearbyLinesSheet extends StatefulWidget {
 class _NearbyLinesSheetState extends State<_NearbyLinesSheet> {
   final Set<LineType> _active = {LineType.bus, LineType.train, LineType.metro};
 
-  List<TransitLine> get _filtered => _active.isEmpty
-      ? _nearbyLines
-      : _nearbyLines.where((l) => _active.contains(l.type)).toList();
+  List<TransitLine> get _filtered => _nearbyLines
+      .where((l) => _active.contains(l.type))
+      .toList();
 
   void _toggle(LineType type) {
     setState(() {
@@ -67,9 +68,9 @@ class _NearbyLinesSheetState extends State<_NearbyLinesSheet> {
       builder: (context, scrollController) {
         return Column(
           children: [
-            // ── Handle + cabeçalho ───────────────────────────────────────
             Padding(
-              padding: const EdgeInsets.fromLTRB(TSizes.md, TSizes.sm, TSizes.md, 0),
+              padding: const EdgeInsets.fromLTRB(
+                  TSizes.md, TSizes.sm, TSizes.md, 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -89,24 +90,24 @@ class _NearbyLinesSheetState extends State<_NearbyLinesSheet> {
                     children: [
                       Text(
                         'Nas proximidades',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                       Text(
                         '${_filtered.length} linhas',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: TColors.grey,
-                            ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.copyWith(color: TColors.grey),
                       ),
                     ],
                   ),
                   const SizedBox(height: TSizes.sm),
-
-                  // ── Chips ──────────────────────────────────────────────
                   Row(
                     children: [
-                      _FilterChip(
+                      LineFilterChip(
                         label: 'Ônibus',
                         icon: Icons.directions_bus,
                         selected: _active.contains(LineType.bus),
@@ -114,7 +115,7 @@ class _NearbyLinesSheetState extends State<_NearbyLinesSheet> {
                         isDark: isDark,
                       ),
                       const SizedBox(width: TSizes.xs),
-                      _FilterChip(
+                      LineFilterChip(
                         label: 'Trem',
                         icon: Icons.train,
                         selected: _active.contains(LineType.train),
@@ -122,7 +123,7 @@ class _NearbyLinesSheetState extends State<_NearbyLinesSheet> {
                         isDark: isDark,
                       ),
                       const SizedBox(width: TSizes.xs),
-                      _FilterChip(
+                      LineFilterChip(
                         label: 'Metrô',
                         icon: Icons.subway,
                         selected: _active.contains(LineType.metro),
@@ -136,21 +137,21 @@ class _NearbyLinesSheetState extends State<_NearbyLinesSheet> {
                 ],
               ),
             ),
-
-            // ── Lista ────────────────────────────────────────────────────
             Expanded(
               child: _filtered.isEmpty
                   ? Center(
                       child: Text(
                         'Nenhuma linha encontrada',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: TColors.grey,
-                            ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(color: TColors.grey),
                       ),
                     )
                   : ListView.separated(
                       controller: scrollController,
-                      padding: const EdgeInsets.symmetric(vertical: TSizes.xs),
+                      padding:
+                          const EdgeInsets.symmetric(vertical: TSizes.xs),
                       itemCount: _filtered.length,
                       separatorBuilder: (_, __) => Divider(
                         height: 1,
@@ -159,7 +160,7 @@ class _NearbyLinesSheetState extends State<_NearbyLinesSheet> {
                             ? Colors.white.withValues(alpha: 0.06)
                             : Colors.black.withValues(alpha: 0.06),
                       ),
-                      itemBuilder: (context, index) => _LineTile(
+                      itemBuilder: (context, index) => LineTile(
                         line: _filtered[index],
                         isDark: isDark,
                       ),
@@ -172,93 +173,7 @@ class _NearbyLinesSheetState extends State<_NearbyLinesSheet> {
   }
 }
 
-// ── Tile da lista ─────────────────────────────────────────────────────────────
-
-class _LineTile extends StatelessWidget {
-  final TransitLine line;
-  final bool isDark;
-
-  const _LineTile({required this.line, required this.isDark});
-
-  IconData get _icon {
-    switch (line.type) {
-      case LineType.bus:   return Icons.directions_bus_outlined;
-      case LineType.metro: return Icons.subway_outlined;
-      case LineType.train: return Icons.train_outlined;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {},
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: TSizes.md,
-          vertical: TSizes.sm,
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: line.color.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(TSizes.cardRadiusMd),
-              ),
-              child: Icon(_icon, color: line.color, size: 22),
-            ),
-            const SizedBox(width: TSizes.sm),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    line.code,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                  ),
-                  Text(
-                    line.name.replaceAll('\n', ' — '),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: isDark
-                              ? TColors.darkTextSecondary
-                              : TColors.textSecondary,
-                        ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: line.color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(TSizes.buttonRadius),
-              ),
-              child: Text(
-                line.type == LineType.bus
-                    ? 'Ônibus'
-                    : line.type == LineType.metro
-                        ? 'Metrô'
-                        : 'Trem',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: line.color,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Widget principal da seção ─────────────────────────────────────────────────
+// ── Seção da home ─────────────────────────────────────────────────────────────
 
 class NearbyVehicles extends StatefulWidget {
   const NearbyVehicles({super.key});
@@ -270,9 +185,9 @@ class NearbyVehicles extends StatefulWidget {
 class _NearbyVehiclesState extends State<NearbyVehicles> {
   final Set<LineType> _active = {LineType.bus, LineType.train};
 
-  List<TransitLine> get _filtered => _active.isEmpty
-      ? _nearbyLines
-      : _nearbyLines.where((l) => _active.contains(l.type)).toList();
+  List<TransitLine> get _filtered => _nearbyLines
+      .where((l) => _active.contains(l.type))
+      .toList();
 
   void _toggle(LineType type) {
     setState(() {
@@ -295,17 +210,15 @@ class _NearbyVehiclesState extends State<NearbyVehicles> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Cabeçalho ──────────────────────────────────────────────────
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Nas proximidades',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+                Text('Nas proximidades',
+                    style: Theme.of(context).textTheme.titleMedium),
                 TextButton(
                   onPressed: () => showNearbyLinesSheet(context),
-                  style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
+                  style: TextButton.styleFrom(
+                      visualDensity: VisualDensity.compact),
                   child: const Row(
                     children: [
                       Text('Ver todos'),
@@ -317,11 +230,9 @@ class _NearbyVehiclesState extends State<NearbyVehicles> {
               ],
             ),
             const SizedBox(height: TSizes.xs),
-
-            // ── Chips de filtro ────────────────────────────────────────────
             Row(
               children: [
-                _FilterChip(
+                LineFilterChip(
                   label: 'Ônibus',
                   icon: Icons.directions_bus,
                   selected: _active.contains(LineType.bus),
@@ -329,7 +240,7 @@ class _NearbyVehiclesState extends State<NearbyVehicles> {
                   isDark: isDark,
                 ),
                 const SizedBox(width: TSizes.xs),
-                _FilterChip(
+                LineFilterChip(
                   label: 'Trem',
                   icon: Icons.train,
                   selected: _active.contains(LineType.train),
@@ -337,7 +248,7 @@ class _NearbyVehiclesState extends State<NearbyVehicles> {
                   isDark: isDark,
                 ),
                 const SizedBox(width: TSizes.xs),
-                _FilterChip(
+                LineFilterChip(
                   label: 'Metrô',
                   icon: Icons.subway,
                   selected: _active.contains(LineType.metro),
@@ -347,144 +258,29 @@ class _NearbyVehiclesState extends State<NearbyVehicles> {
               ],
             ),
             const SizedBox(height: TSizes.spaceBtwItems),
-
-            // ── Cards horizontais ──────────────────────────────────────────
             SizedBox(
               height: 120,
               child: _filtered.isEmpty
                   ? Center(
                       child: Text(
                         'Nenhuma linha nas proximidades',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: TColors.grey,
-                            ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.copyWith(color: TColors.grey),
                       ),
                     )
                   : ListView.separated(
                       scrollDirection: Axis.horizontal,
                       itemCount: _filtered.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: TSizes.xs),
+                      separatorBuilder: (_, __) =>
+                          const SizedBox(width: TSizes.xs),
                       itemBuilder: (context, index) =>
-                          _LineCard(line: _filtered[index]),
+                          LineCard(line: _filtered[index]),
                     ),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-// ── Chip de filtro ────────────────────────────────────────────────────────────
-
-class _FilterChip extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final bool selected;
-  final VoidCallback onTap;
-  final bool isDark;
-
-  const _FilterChip({
-    required this.label,
-    required this.icon,
-    required this.selected,
-    required this.onTap,
-    required this.isDark,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bg = selected
-        ? (isDark ? TColors.light : TColors.dark)
-        : Colors.transparent;
-    final fg = selected
-        ? (isDark ? TColors.dark : TColors.light)
-        : (isDark ? TColors.darkTextSecondary : TColors.textSecondary);
-    final border = selected
-        ? Colors.transparent
-        : (isDark
-            ? Colors.white.withValues(alpha: 0.2)
-            : Colors.black.withValues(alpha: 0.2));
-
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(TSizes.buttonRadius),
-          border: Border.all(color: border),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 16, color: fg),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: fg,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Card de linha ─────────────────────────────────────────────────────────────
-
-class _LineCard extends StatelessWidget {
-  final TransitLine line;
-
-  const _LineCard({required this.line});
-
-  IconData get _icon {
-    switch (line.type) {
-      case LineType.bus:   return Icons.directions_bus;
-      case LineType.metro: return Icons.subway;
-      case LineType.train: return Icons.train;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 120,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: line.color,
-        borderRadius: BorderRadius.circular(TSizes.cardRadiusLg),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(_icon, color: Colors.white, size: 22),
-          const Spacer(),
-          Text(
-            line.code,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            line.name,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.85),
-              fontSize: 11,
-              height: 1.3,
-            ),
-          ),
-        ],
       ),
     );
   }
