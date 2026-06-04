@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mobilidade_urbana_app/core/data_state/data_state.dart';
 import 'package:mobilidade_urbana_app/core/services/auth_service.dart';
 import 'package:mobilidade_urbana_app/core/services/device_token_service.dart';
@@ -11,7 +12,7 @@ class DioClient {
 
   static Dio _build() {
     final dio = Dio(BaseOptions(
-      baseUrl: 'http://10.0.2.2:8080',
+      baseUrl: dotenv.get('API_BASE_URL', fallback: 'http://10.0.2.2:8080'),
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
       headers: {'Content-Type': 'application/json'},
