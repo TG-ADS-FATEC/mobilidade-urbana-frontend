@@ -21,16 +21,14 @@ class _LinesScreenState extends ConsumerState<LinesScreen>
   late final TabController _tabController;
   late final TextEditingController _searchController;
   late final ScrollController _scrollController;
-  String _query = '';
-
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 5, vsync: this);
     _searchController = TextEditingController();
-    _searchController.addListener(
-      () => setState(() => _query = _searchController.text.toLowerCase()),
-    );
+    _searchController.addListener(() {
+      ref.read(linesControllerProvider.notifier).onQueryChanged(_searchController.text);
+    });
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
   }
@@ -51,18 +49,13 @@ class _LinesScreenState extends ConsumerState<LinesScreen>
   }
 
   List<LineEntity> _filtered(List<LineEntity> all, int tabIndex) {
-    List<LineEntity> base;
     switch (tabIndex) {
-      case 0:  base = all.where((l) => l.isFavorite).toList();
-      case 2:  base = all.where((l) => l.type == LineType.bus).toList();
-      case 3:  base = all.where((l) => l.type == LineType.train).toList();
-      case 4:  base = all.where((l) => l.type == LineType.metro).toList();
-      default: base = all;
+      case 0:  return all.where((l) => l.isFavorite).toList();
+      case 2:  return all.where((l) => l.type == LineType.bus).toList();
+      case 3:  return all.where((l) => l.type == LineType.train).toList();
+      case 4:  return all.where((l) => l.type == LineType.metro).toList();
+      default: return all;
     }
-    if (_query.isEmpty) return base;
-    return base.where((l) =>
-        l.code.toLowerCase().contains(_query) ||
-        l.name.toLowerCase().contains(_query)).toList();
   }
 
   @override
