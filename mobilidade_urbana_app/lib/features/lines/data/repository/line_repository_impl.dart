@@ -11,12 +11,14 @@ class LineRepositoryImpl implements LineRepository {
   LineRepositoryImpl(this._remote);
 
   @override
-  Future<DataState<List<LineEntity>>> getLines() async {
+  Future<DataState<({List<LineEntity> items, bool hasNext})>> getLines({int page = 0, int size = 20}) async {
     try {
-      final lines = await _remote.getLines();
-      return DataSuccess(lines);
+      final result = await _remote.getLines(page: page, size: size);
+      return DataSuccess((items: result.items, hasNext: result.hasNext));
     } on DioException catch (e) {
       return DataFailed(_failure(e, 'Erro ao carregar linhas'));
+    } catch (e) {
+      return DataFailed(ServerFailure(e.toString()));
     }
   }
 
@@ -27,6 +29,8 @@ class LineRepositoryImpl implements LineRepository {
       return DataSuccess(lines);
     } on DioException catch (e) {
       return DataFailed(_failure(e, 'Erro ao buscar linhas'));
+    } catch (e) {
+      return DataFailed(ServerFailure(e.toString()));
     }
   }
 
