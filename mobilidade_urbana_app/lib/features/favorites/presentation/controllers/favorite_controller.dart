@@ -98,8 +98,11 @@ class FavoriteNotifier extends Notifier<FavoriteState> {
     return FavoriteEntity(
       favoriteId: entity.favoriteId,
       favoriteName: entity.favoriteName,
-      address: addr,
+      shortName: entity.shortName,
+      routeType: entity.routeType,
+      routeId: entity.routeId,
       createdAt: entity.createdAt,
+      address: addr,
     );
   }
 
@@ -138,8 +141,11 @@ class FavoriteNotifier extends Notifier<FavoriteState> {
           entityToAdd = FavoriteEntity(
             favoriteId: data.favoriteId,
             favoriteName: data.favoriteName,
-            address: favorite.address,
+            shortName: data.shortName,
+            routeType: data.routeType,
+            routeId: data.routeId,
             createdAt: data.createdAt,
+            address: favorite.address,
           );
         }
         state = state.copyWith(isLoading: false, favorites: [...state.favorites, entityToAdd]);
@@ -162,8 +168,11 @@ class FavoriteNotifier extends Notifier<FavoriteState> {
             updatedEntity = FavoriteEntity(
               favoriteId: data.favoriteId,
               favoriteName: data.favoriteName,
-              address: favorite.address,
+              shortName: data.shortName,
+              routeType: data.routeType,
+              routeId: data.routeId,
               createdAt: data.createdAt,
+              address: favorite.address,
             );
           } else {
             await _removeLocalAddress(favorite.favoriteId!);
