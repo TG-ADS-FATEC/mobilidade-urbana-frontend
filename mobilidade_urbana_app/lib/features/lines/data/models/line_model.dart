@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:mobilidade_urbana_app/features/lines/domain/entities/line_entity.dart';
 
 class LineModel extends LineEntity {
@@ -25,15 +26,22 @@ class LineModel extends LineEntity {
 
   /// Parseia a resposta do backend (RouteDTO).
   factory LineModel.fromJson(Map<String, dynamic> json) {
-    return LineModel(
-      id: json['routeId'] as String?,
-      code: json['routeShortName'] as String? ?? '',
-      name: json['routeLongName'] as String? ?? '',
-      type: _parseType(json['routeType']),
-      colorValue: _parseColor(json['routeColor'] as String? ?? 'FF6B00'),
-      textColorValue: _parseColor(json['routeTextColor'] as String? ?? 'FFFFFF'),
-      agencyId: json['agencyId'] as String?,
-    );
+    debugPrint('[LineModel] parsing: ${json['routeId']} | color=${json['routeColor']} | textColor=${json['routeTextColor']} | type=${json['routeType']}');
+    try {
+      return LineModel(
+        id: json['routeId'] as String?,
+        code: json['routeShortName'] as String? ?? '',
+        name: json['routeLongName'] as String? ?? '',
+        type: _parseType(json['routeType']),
+        colorValue: _parseColor(json['routeColor'] as String? ?? 'FF6B00'),
+        textColorValue: _parseColor(json['routeTextColor'] as String? ?? 'FFFFFF'),
+        agencyId: json['agencyId'] as String?,
+      );
+    } catch (e) {
+      debugPrint('[LineModel] FAILED on: $json');
+      debugPrint('[LineModel] error: $e');
+      rethrow;
+    }
   }
 
   /// Aceita nome do enum ("BUS", "METRO", "TRAIN")
