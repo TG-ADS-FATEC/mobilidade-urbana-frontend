@@ -7,7 +7,7 @@ class GetLinesUsecase {
 
   const GetLinesUsecase(this.repository);
 
-  Future<DataState<List<LineEntity>>> call() async {
-    return await repository.getLines();
+  Future<DataState<({List<LineEntity> items, bool hasNext})>> call({int page = 0, int size = 20}) async {
+    return await repository.getLines(page: page, size: size);
   }
 }
