@@ -10,10 +10,19 @@ abstract class LineRemoteDatasource {
 class LineRemoteDataSourceImpl implements LineRemoteDatasource {
   final Dio _dio = DioClient.instance;
 
+  List<dynamic> _extractList(dynamic data, [String key = 'routes']) {
+    if (data is List) return data;
+    if (data is Map<String, dynamic>) {
+      final value = data[key] ?? data['data'];
+      if (value is List) return value;
+    }
+    throw FormatException('Unexpected response format: $data');
+  }
+
   @override
   Future<List<LineModel>> getLines() async {
     final response = await _dio.get('/routes');
-    return (response.data as List)
+    return _extractList(response.data)
         .map((json) => LineModel.fromJson(json as Map<String, dynamic>))
         .toList();
   }
@@ -24,7 +33,7 @@ class LineRemoteDataSourceImpl implements LineRemoteDatasource {
       '/routes/search',
       queryParameters: {'query': query},
     );
-    return (response.data as List)
+    return _extractList(response.data)
         .map((json) => LineModel.fromJson(json as Map<String, dynamic>))
         .toList();
   }
