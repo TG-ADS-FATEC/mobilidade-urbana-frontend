@@ -3,5 +3,4 @@ import 'package:mobilidade_urbana_app/features/lines/domain/entities/line_entity
 
 abstract class LineRepository {
   Future<DataState<List<LineEntity>>> getLines();
-  Future<DataState<List<LineEntity>>> searchLines(String query);
 }
