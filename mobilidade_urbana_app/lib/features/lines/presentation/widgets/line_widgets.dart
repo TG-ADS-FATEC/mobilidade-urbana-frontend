@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:mobilidade_urbana_app/features/lines/data/transit_line.dart';
+import 'package:mobilidade_urbana_app/features/lines/domain/entities/line_entity.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
 
 // ── Tile de linha (lista vertical) ────────────────────────────────────────────
 
 class LineTile extends StatelessWidget {
-  final TransitLine line;
+  final LineEntity line;
   final bool isDark;
   final VoidCallback? onTap;
 
@@ -50,7 +50,7 @@ class LineTile extends StatelessWidget {
                   width: 26,
                   height: 3,
                   decoration: BoxDecoration(
-                    color: line.color,
+                    color: Color(line.colorValue),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -91,7 +91,7 @@ class LineTile extends StatelessWidget {
 // ── Card de linha (scroll horizontal) ────────────────────────────────────────
 
 class LineCard extends StatelessWidget {
-  final TransitLine line;
+  final LineEntity line;
   final VoidCallback? onTap;
 
   const LineCard({super.key, required this.line, this.onTap});
@@ -112,18 +112,18 @@ class LineCard extends StatelessWidget {
         width: 120,
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: line.color,
+          color: Color(line.colorValue),
           borderRadius: BorderRadius.circular(TSizes.cardRadiusLg),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(_icon, color: Colors.white, size: 22),
+            Icon(_icon, color: Color(line.textColorValue), size: 22),
             const Spacer(),
             Text(
               line.code,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: Color(line.textColorValue),
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
               ),
@@ -134,7 +134,7 @@ class LineCard extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.85),
+                color: Color(line.textColorValue).withValues(alpha: 0.85),
                 fontSize: 11,
                 height: 1.3,
               ),
