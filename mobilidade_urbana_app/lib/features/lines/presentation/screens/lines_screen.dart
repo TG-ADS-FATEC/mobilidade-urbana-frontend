@@ -1,45 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:mobilidade_urbana_app/features/lines/data/transit_line.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobilidade_urbana_app/features/lines/domain/entities/line_entity.dart';
+import 'package:mobilidade_urbana_app/features/lines/presentation/controllers/lines_controller.dart';
 import 'package:mobilidade_urbana_app/features/lines/presentation/widgets/line_widgets.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
 import 'package:mobilidade_urbana_app/utils/helpers/helper_functions.dart';
 
-// ── Dados mock ────────────────────────────────────────────────────────────────
-
-const _mockLines = [
-  TransitLine(code: '809H-10', name: 'Jardim Boa Vista - Lapa',       type: LineType.bus,   color: Color(0xFFFF6B00), isFavorite: true),
-  TransitLine(code: '748A-41', name: 'Jardim Peri Peri - Lapa',       type: LineType.bus,   color: Color(0xFFFF6B00), isFavorite: true),
-  TransitLine(code: '107A-10', name: 'Lapa - Metrô Santana',          type: LineType.bus,   color: Color(0xFFFF6B00)),
-  TransitLine(code: '251P-10', name: 'Pinheiros - Metrô Ana Rosa',    type: LineType.bus,   color: Color(0xFFFF6B00)),
-  TransitLine(code: '675A-10', name: 'Itaim Paulista - Sé',           type: LineType.bus,   color: Color(0xFFFF6B00)),
-  TransitLine(code: '1',       name: 'Linha Azul - Jabaquara',        type: LineType.metro, color: Color(0xFF0057A8), isFavorite: true),
-  TransitLine(code: '2',       name: 'Linha Verde - Vila Madalena',   type: LineType.metro, color: Color(0xFF007A47)),
-  TransitLine(code: '3',       name: 'Linha Vermelha - Palmeiras',    type: LineType.metro, color: Color(0xFFE30613)),
-  TransitLine(code: '4',       name: 'Linha Amarela - Butantã',       type: LineType.metro, color: Color(0xFFFFCC00)),
-  TransitLine(code: '5',       name: 'Linha Lilás - Capão Redondo',   type: LineType.metro, color: Color(0xFF9B5EA2)),
-  TransitLine(code: '7',       name: 'Linha Rubi - Jundiaí',          type: LineType.train, color: Color(0xFFBE1E2D)),
-  TransitLine(code: '8',       name: 'Linha Diamante - Amador Bueno', type: LineType.train, color: Color(0xFF9E9E9E)),
-  TransitLine(code: '9',       name: 'Linha Esmeralda - Osasco',      type: LineType.train, color: Color(0xFF00A651), isFavorite: true),
-  TransitLine(code: '10',      name: 'Linha Turquesa - Rio Grande',   type: LineType.train, color: Color(0xFF009BA5)),
-  TransitLine(code: '11',      name: 'Linha Coral - Estudantes',      type: LineType.train, color: Color(0xFFE05206)),
-  TransitLine(code: '12',      name: 'Linha Safira - Calmon Viana',   type: LineType.train, color: Color(0xFF003893)),
-  TransitLine(code: '13',      name: 'Linha Jade - Aeroporto',        type: LineType.train, color: Color(0xFF00884A)),
-];
-
 // ── Tela ──────────────────────────────────────────────────────────────────────
 
-class LinesScreen extends StatefulWidget {
+class LinesScreen extends ConsumerStatefulWidget {
   const LinesScreen({super.key});
 
   @override
-  State<LinesScreen> createState() => _LinesScreenState();
+  ConsumerState<LinesScreen> createState() => _LinesScreenState();
 }
 
-class _LinesScreenState extends State<LinesScreen>
+class _LinesScreenState extends ConsumerState<LinesScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
   late final TextEditingController _searchController;
+  late final ScrollController _scrollController;
   String _query = '';
 
   @override
@@ -50,23 +31,33 @@ class _LinesScreenState extends State<LinesScreen>
     _searchController.addListener(
       () => setState(() => _query = _searchController.text.toLowerCase()),
     );
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    final pos = _scrollController.position;
+    if (pos.pixels >= pos.maxScrollExtent - 300) {
+      ref.read(linesControllerProvider.notifier).loadMore();
+    }
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
-  List<TransitLine> _filtered(int tabIndex) {
-    List<TransitLine> base;
+  List<LineEntity> _filtered(List<LineEntity> all, int tabIndex) {
+    List<LineEntity> base;
     switch (tabIndex) {
-      case 0:  base = _mockLines.where((l) => l.isFavorite).toList();
-      case 2:  base = _mockLines.where((l) => l.type == LineType.bus).toList();
-      case 3:  base = _mockLines.where((l) => l.type == LineType.train).toList();
-      case 4:  base = _mockLines.where((l) => l.type == LineType.metro).toList();
-      default: base = _mockLines;
+      case 0:  base = all.where((l) => l.isFavorite).toList();
+      case 2:  base = all.where((l) => l.type == LineType.bus).toList();
+      case 3:  base = all.where((l) => l.type == LineType.train).toList();
+      case 4:  base = all.where((l) => l.type == LineType.metro).toList();
+      default: base = all;
     }
     if (_query.isEmpty) return base;
     return base.where((l) =>
@@ -77,97 +68,84 @@ class _LinesScreenState extends State<LinesScreen>
   @override
   Widget build(BuildContext context) {
     final isDark = THelperFunctions.isDarkMode(context);
+    final linesState = ref.watch(linesControllerProvider);
+    final allLines = linesState.lines;
+
+    final hintColor =
+        isDark ? TColors.darkTextSecondary : TColors.textSecondary;
+    final fieldBg = isDark
+        ? Colors.white.withValues(alpha: 0.06)
+        : Colors.black.withValues(alpha: 0.05);
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        backgroundColor: isDark ? TColors.dark : TColors.white,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
         titleSpacing: TSizes.md,
-        title: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: TColors.soothingLime,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.directions_bus, color: Colors.black, size: 18),
-            ),
-            const SizedBox(width: TSizes.xs),
-            Text(
-              'sptrans',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-          ],
+        title: const Text(
+          'Linhas',
+          style: TextStyle(fontWeight: FontWeight.w700),
         ),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(104),
+          preferredSize: const Size.fromHeight(52 + 46),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // ── Search bar ────────────────────────────────────────────
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: TSizes.sm,
-                  vertical: TSizes.xs,
-                ),
-                child: Container(
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: isDark ? TColors.darkSurface : TColors.lightGrey,
-                    borderRadius: BorderRadius.circular(TSizes.cardRadiusLg),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: TSizes.sm),
-                  child: Row(
-                    children: [
-                      Icon(Icons.search,
-                          color: isDark
-                              ? TColors.darkTextSecondary
-                              : TColors.textSecondary,
-                          size: TSizes.iconMd),
-                      const SizedBox(width: TSizes.xs),
-                      Expanded(
-                        child: TextField(
-                          controller: _searchController,
-                          decoration: InputDecoration(
-                            hintText: 'Pesquise uma linha',
-                            border: InputBorder.none,
-                            hintStyle:
-                                Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: isDark
-                                          ? TColors.darkTextSecondary
-                                          : TColors.textSecondary,
-                                    ),
-                          ),
-                        ),
+                padding: const EdgeInsets.fromLTRB(
+                    TSizes.md, 0, TSizes.md, TSizes.xs),
+                child: SizedBox(
+                  height: 40,
+                  child: TextField(
+                    controller: _searchController,
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: isDark ? TColors.white : TColors.dark),
+                    decoration: InputDecoration(
+                      hintText: 'Buscar linha ou código...',
+                      hintStyle: TextStyle(fontSize: 14, color: hintColor),
+                      prefixIcon:
+                          Icon(Icons.search, size: 20, color: hintColor),
+                      suffixIcon: ValueListenableBuilder<TextEditingValue>(
+                        valueListenable: _searchController,
+                        builder: (_, value, __) => value.text.isEmpty
+                            ? const SizedBox.shrink()
+                            : GestureDetector(
+                                onTap: _searchController.clear,
+                                child: Icon(Icons.close,
+                                    size: 18, color: hintColor),
+                              ),
                       ),
-                      if (_query.isNotEmpty)
-                        GestureDetector(
-                          onTap: _searchController.clear,
-                          child: const Icon(Icons.close,
-                              size: TSizes.iconMd, color: TColors.grey),
-                        ),
-                    ],
+                      filled: true,
+                      fillColor: fieldBg,
+                      contentPadding: EdgeInsets.zero,
+                      border: OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(TSizes.inputFieldRadius),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
                   ),
                 ),
               ),
-
-              // ── Tabs ──────────────────────────────────────────────────
               TabBar(
                 controller: _tabController,
                 isScrollable: true,
                 tabAlignment: TabAlignment.start,
-                indicatorColor: TColors.soothingLime,
-                indicatorWeight: 3,
-                labelColor: TColors.soothingLime,
-                unselectedLabelColor: isDark
-                    ? TColors.darkTextSecondary
-                    : TColors.textSecondary,
                 labelStyle: const TextStyle(
-                    fontWeight: FontWeight.w600, fontSize: 14),
+                    fontSize: 13, fontWeight: FontWeight.w600),
                 unselectedLabelStyle: const TextStyle(
-                    fontWeight: FontWeight.w400, fontSize: 14),
+                    fontSize: 13, fontWeight: FontWeight.w400),
+                labelColor: isDark ? TColors.white : TColors.dark,
+                unselectedLabelColor: hintColor,
+                indicatorColor: isDark ? TColors.white : TColors.dark,
+                indicatorSize: TabBarIndicatorSize.label,
+                dividerColor: isDark
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : Colors.black.withValues(alpha: 0.08),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: TSizes.xs),
                 tabs: const [
                   Tab(text: 'Favoritos'),
                   Tab(text: 'Todos'),
@@ -180,38 +158,111 @@ class _LinesScreenState extends State<LinesScreen>
           ),
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: List.generate(5, (i) {
-          final lines = _filtered(i);
-          if (lines.isEmpty) {
-            return Center(
-              child: Text(
-                'Nenhuma linha encontrada',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: isDark
-                          ? TColors.darkTextSecondary
-                          : TColors.textSecondary,
-                    ),
-              ),
-            );
-          }
-          return ListView.separated(
-            itemCount: lines.length,
-            separatorBuilder: (_, __) => Divider(
-              height: 1,
-              indent: 72,
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.06)
-                  : Colors.black.withValues(alpha: 0.06),
+      body: switch ((linesState.isLoading, linesState.errorMessage)) {
+        (true, _) => const Center(child: CircularProgressIndicator()),
+        (_, final String msg?) => _ErrorBody(
+            message: msg,
+            isDark: isDark,
+            onRetry: () => ref.read(linesControllerProvider.notifier).loadLines(),
+          ),
+        _ => TabBarView(
+            controller: _tabController,
+            children: List.generate(5, (i) {
+              final lines = _filtered(allLines, i);
+
+              if (lines.isEmpty) {
+                return Center(
+                  child: Text(
+                    'Nenhuma linha encontrada',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: isDark
+                              ? TColors.darkTextSecondary
+                              : TColors.textSecondary,
+                        ),
+                  ),
+                );
+              }
+              final showFooter = linesState.isLoadingMore && i == 1;
+              return ListView.separated(
+                controller: i == 1 ? _scrollController : null,
+                itemCount: lines.length + (showFooter ? 1 : 0),
+                separatorBuilder: (_, __) => Divider(
+                  height: 1,
+                  indent: 72,
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.06)
+                      : Colors.black.withValues(alpha: 0.06),
+                ),
+                itemBuilder: (context, index) {
+                  if (showFooter && index == lines.length) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  return LineTile(line: lines[index], isDark: isDark);
+                },
+              );
+            }),
+          ),
+      },
+    );
+  }
+}
+
+// ── Estado de erro ─────────────────────────────────────────────────────────────
+
+class _ErrorBody extends StatelessWidget {
+  final String message;
+  final bool isDark;
+  final VoidCallback onRetry;
+
+  const _ErrorBody({
+    required this.message,
+    required this.isDark,
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final secondary = isDark ? TColors.darkTextSecondary : TColors.textSecondary;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: TSizes.lg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.cloud_off_rounded, size: 48, color: secondary),
+            const SizedBox(height: TSizes.sm),
+            Text(
+              'Não foi possível carregar as linhas',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleSmall
+                  ?.copyWith(fontWeight: FontWeight.w600),
+              textAlign: TextAlign.center,
             ),
-            itemBuilder: (context, index) => LineTile(
-              line: lines[index],
-              isDark: isDark,
+            const SizedBox(height: TSizes.xs),
+            Text(
+              message,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: secondary),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-          );
-        }),
+            const SizedBox(height: TSizes.md),
+            FilledButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh, size: 18),
+              label: const Text('Tentar novamente'),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+
