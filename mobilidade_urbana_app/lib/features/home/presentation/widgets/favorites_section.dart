@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:mobilidade_urbana_app/features/favorites/domain/entities/favorite_entity.dart';
-import 'package:mobilidade_urbana_app/features/favorites/presentation/controllers/favorite_controller.dart';
+import 'package:mobilidade_urbana_app/features/favorites/domain/entities/trip_favorite_entity.dart';
+import 'package:mobilidade_urbana_app/features/favorites/presentation/controllers/trip_favorite_controller.dart';
 import 'package:mobilidade_urbana_app/features/favorites/presentation/screens/favorites_screen.dart';
-import 'package:mobilidade_urbana_app/features/favorites/presentation/widgets/favorite_form_bottom_sheet.dart';
+import 'package:mobilidade_urbana_app/features/favorites/presentation/widgets/favorite_form_bottom_sheet.dart' show TripFavoriteFormBottomSheet;
 import 'package:mobilidade_urbana_app/features/travel/presentation/controllers/travel_controller.dart';
 import 'package:mobilidade_urbana_app/navigation_menu.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
@@ -19,7 +21,7 @@ class FavoritesSection extends ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => const FavoriteFormBottomSheet(),
+      builder: (_) => const TripFavoriteFormBottomSheet(),
     );
   }
 
@@ -31,8 +33,8 @@ class FavoritesSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final favState = ref.watch(favoriteControllerProvider);
-    final top3 = favState.topFavorites;
+    final tripState = ref.watch(tripFavoriteProvider);
+    final top3 = tripState.trips.take(3).toList();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SizedBox(
@@ -53,7 +55,7 @@ class FavoritesSection extends ConsumerWidget {
                     IconButton(
                       onPressed: () => _openAddSheet(context),
                       icon: const Icon(Icons.add_circle_outline),
-                      tooltip: 'Novo favorito',
+                      tooltip: 'Novo destino',
                       visualDensity: VisualDensity.compact,
                     ),
                   ],
@@ -79,7 +81,7 @@ class FavoritesSection extends ConsumerWidget {
             ),
             const SizedBox(height: TSizes.spaceBtwItems),
 
-            if (favState.isLoading)
+            if (tripState.isLoading)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: TSizes.lg),
                 child: CircularProgressIndicator(color: TColors.primary),
@@ -88,19 +90,20 @@ class FavoritesSection extends ConsumerWidget {
               _EmptySection(onAdd: () => _openAddSheet(context))
             else
               ...top3.map(
-                (fav) => _FavoriteCard(
-                  favorite: fav,
+                (trip) => _FavoriteCard(
+                  trip: trip,
                   isDark: isDark,
                   onTap: () {
-                    ref.read(travelDestinationProvider.notifier).state = fav;
-                    ref
-                        .read(navigationMenuProvider.notifier)
-                        .onTabChanged(1);
-                    if (fav.favoriteId != null) {
-                      ref
-                          .read(favoriteControllerProvider.notifier)
-                          .incrementUsage(fav.favoriteId!);
-                    }
+                    // Converte para FavoriteEntity que o travel_screen espera
+                    ref.read(travelDestinationProvider.notifier).state =
+                        FavoriteEntity(
+                      favoriteName: trip.name,
+                      address: trip.address,
+                    );
+                    // Passa lat/lng já resolvido — evita geocoding
+                    ref.read(travelDestinationLatLngProvider.notifier).state =
+                        LatLng(trip.destinationLatitude, trip.destinationLongitude);
+                    ref.read(navigationMenuProvider.notifier).onTabChanged(1);
                   },
                 ),
               ),
@@ -153,12 +156,12 @@ class _EmptySection extends StatelessWidget {
 }
 
 class _FavoriteCard extends StatelessWidget {
-  final FavoriteEntity favorite;
+  final TripFavoriteEntity trip;
   final bool isDark;
   final VoidCallback onTap;
 
   const _FavoriteCard({
-    required this.favorite,
+    required this.trip,
     required this.isDark,
     required this.onTap,
   });
@@ -188,7 +191,7 @@ class _FavoriteCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(TSizes.cardRadiusMd),
                 ),
                 child: Icon(
-                  Icons.star_rounded,
+                  Icons.place_rounded,
                   color: isDark ? TColors.light : TColors.dark,
                   size: 22,
                 ),
@@ -199,15 +202,15 @@ class _FavoriteCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      favorite.favoriteName,
+                      trip.name,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
                     ),
-                    if (favorite.address != null) ...[
+                    if (trip.address != null) ...[
                       const SizedBox(height: 2),
                       Text(
-                        favorite.address!,
+                        trip.address!,
                         style: Theme.of(context)
                             .textTheme
                             .bodySmall
