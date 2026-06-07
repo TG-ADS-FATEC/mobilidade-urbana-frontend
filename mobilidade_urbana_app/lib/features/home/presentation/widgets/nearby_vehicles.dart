@@ -93,7 +93,7 @@ class _NearbyLinesSheetState extends State<_NearbyLinesSheet> {
                         style:
                             Theme.of(context).textTheme.titleLarge?.copyWith(
                                   fontWeight: FontWeight.bold,
-                                ),
+                            ),
                       ),
                       Text(
                         '${_filtered.length} linhas',
@@ -219,11 +219,11 @@ class _NearbyVehiclesState extends State<NearbyVehicles> {
                   onPressed: () => showNearbyLinesSheet(context),
                   style: TextButton.styleFrom(
                       visualDensity: VisualDensity.compact),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Text('Ver todos'),
-                      SizedBox(width: 2),
-                      Icon(Icons.keyboard_arrow_down, size: 16),
+                      Text('Ver todos', style: TextStyle(color: isDark ? TColors.light : TColors.dark)),
+                      const SizedBox(width: 2),
+                      Icon(Icons.keyboard_arrow_down, size: 16, color: isDark ? TColors.light : TColors.dark,),
                     ],
                   ),
                 ),
