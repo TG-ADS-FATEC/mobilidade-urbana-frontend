@@ -11,6 +11,7 @@ class LineModel extends LineEntity {
     super.textColorValue,
     super.agencyId,
     super.isFavorite,
+    super.stops,
   });
 
   factory LineModel.fromEntity(LineEntity entity) => LineModel(
@@ -22,6 +23,7 @@ class LineModel extends LineEntity {
         textColorValue: entity.textColorValue,
         agencyId: entity.agencyId,
         isFavorite: entity.isFavorite,
+        stops: entity.stops,
       );
 
   /// Parseia a resposta do backend (RouteDTO).
