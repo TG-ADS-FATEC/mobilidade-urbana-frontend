@@ -37,6 +37,8 @@ class FavoritesSection extends ConsumerWidget {
     final top3 = tripState.trips.take(3).toList();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+
     return SizedBox(
       width: double.infinity,
       child: Padding(
@@ -46,32 +48,42 @@ class FavoritesSection extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Text(
-                      'Favoritos',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    IconButton(
-                      onPressed: () => _openAddSheet(context),
-                      icon: const Icon(Icons.add_circle_outline),
-                      tooltip: 'Novo destino',
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  ],
+                Text(
+                  'Favoritos',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: onSurface,
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 Row(
                   children: [
+                    FilledButton.icon(
+                      onPressed: () => _openAddSheet(context),
+                      icon: const Icon(Icons.add, size: 16),
+                      label: const Text('Novo'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: TColors.soothingLime,
+                        foregroundColor: TColors.black,
+                        padding: const EdgeInsets.symmetric(horizontal: TSizes.xs, vertical: TSizes.xxs),
+                        visualDensity: VisualDensity.compact,
+                        textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                      ),
+                    ),
+                    const SizedBox(width: TSizes.xxs),
                     TextButton(
                       onPressed: () => _openFavoritesScreen(context),
                       style: TextButton.styleFrom(
+                        foregroundColor: onSurface,
                         visualDensity: VisualDensity.compact,
+                        padding: const EdgeInsets.symmetric(horizontal: TSizes.xxs),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Text('Ver todos'),
-                          SizedBox(width: 2),
-                          Icon(Icons.keyboard_arrow_right, size: 16),
+                          Text(
+                            'Ver todos',
+                            style: TextStyle(color: onSurface, fontSize: 13),
+                          ),
+                          Icon(Icons.keyboard_arrow_right, size: 16, color: onSurface),
                         ],
                       ),
                     ),
@@ -143,7 +155,7 @@ class _EmptySection extends StatelessWidget {
             style: FilledButton.styleFrom(
               backgroundColor: TColors.soothingLime,
               foregroundColor: TColors.textPrimary,
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: TSizes.xl, vertical: TSizes.sm),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(TSizes.buttonRadius),
               ),
@@ -176,7 +188,7 @@ class _FavoriteCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: TSizes.sm,
-            vertical: 12,
+            vertical: TSizes.xs,
           ),
           decoration: BoxDecoration(
             color: isDark ? TColors.darkSurface : TColors.surface,
@@ -185,7 +197,7 @@ class _FavoriteCard extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(TSizes.xs),
                 decoration: BoxDecoration(
                   color: isDark ? TColors.darkBackground : TColors.lightGrey,
                   borderRadius: BorderRadius.circular(TSizes.cardRadiusMd),
@@ -196,7 +208,7 @@ class _FavoriteCard extends StatelessWidget {
                   size: 22,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: TSizes.xs),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,7 +220,7 @@ class _FavoriteCard extends StatelessWidget {
                           ),
                     ),
                     if (trip.address != null) ...[
-                      const SizedBox(height: 2),
+                      const SizedBox(height: TSizes.xxs),
                       Text(
                         trip.address!,
                         style: Theme.of(context)
