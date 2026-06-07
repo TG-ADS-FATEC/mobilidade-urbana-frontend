@@ -25,6 +25,9 @@ class LineEntity extends Equatable {
 
   final bool isFavorite;
 
+  /// Paradas locais (metrô/trem). Nulo para ônibus — carregado via API.
+  final List<String>? stops;
+
   const LineEntity({
     this.id,
     required this.code,
@@ -34,9 +37,10 @@ class LineEntity extends Equatable {
     this.textColorValue = 0xFFFFFFFF,
     this.agencyId,
     this.isFavorite = false,
+    this.stops,
   });
 
   @override
   List<Object?> get props =>
-      [id, code, name, type, colorValue, textColorValue, agencyId, isFavorite];
+      [id, code, name, type, colorValue, textColorValue, agencyId, isFavorite, stops];
 }
