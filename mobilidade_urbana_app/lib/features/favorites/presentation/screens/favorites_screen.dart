@@ -167,7 +167,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                         ),
                       ),
 
-                    const SizedBox(height: 80), // espaço para FAB
+                    const SizedBox(height: TSizes.twoXl), // espaço para FAB
                   ],
                 ),
     );
@@ -185,6 +185,7 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return Padding(
       padding: const EdgeInsets.only(
         top: TSizes.xs,
@@ -194,25 +195,27 @@ class _SectionHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: TColors.primary),
-          const SizedBox(width: 6),
+          Icon(icon, size: 18, color: onSurface),
+          const SizedBox(width: TSizes.xxs),
           Text(
             label,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: TColors.primary,
+                  color: onSurface,
                 ),
           ),
           const Spacer(),
           if (onAdd != null)
-            TextButton.icon(
+            FilledButton.icon(
               onPressed: onAdd,
               icon: const Icon(Icons.add, size: 16),
               label: const Text('Novo'),
-              style: TextButton.styleFrom(
-                foregroundColor: TColors.primary,
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+              style: FilledButton.styleFrom(
+                backgroundColor: TColors.soothingLime,
+                foregroundColor: TColors.black,
+                padding: const EdgeInsets.symmetric(horizontal: TSizes.xs, vertical: TSizes.xxs),
                 visualDensity: VisualDensity.compact,
+                textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
               ),
             ),
         ],
@@ -246,7 +249,7 @@ class _SectionEmpty extends StatelessWidget {
             style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
           ),
           if (hint != null) ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: TSizes.xxs),
             Text(
               hint!,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[500]),
@@ -260,7 +263,7 @@ class _SectionEmpty extends StatelessWidget {
               label: Text(addLabel!),
               style: OutlinedButton.styleFrom(
                 visualDensity: VisualDensity.compact,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: TSizes.xs, vertical: TSizes.xxs),
               ),
             ),
           ],
@@ -413,10 +416,10 @@ class _RouteTile extends StatelessWidget {
             children: [
               if (favorite.shortName != null) ...[
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: TSizes.xxs, vertical: TSizes.xxs),
                   decoration: BoxDecoration(
                     color: _typeColor.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(TSizes.borderRadiusSm),
                   ),
                   child: Text(
                     favorite.shortName!,
@@ -427,7 +430,7 @@ class _RouteTile extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: TSizes.xxs),
               ],
               Text(
                 _typeLabel,
