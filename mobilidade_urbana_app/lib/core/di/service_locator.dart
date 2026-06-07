@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:mobilidade_urbana_app/features/favorites/data/data_sources/favorite_remote_datasource.dart';
 import 'package:mobilidade_urbana_app/features/lines/data/data_sources/line_local_datasource.dart';
 import 'package:mobilidade_urbana_app/features/lines/data/data_sources/line_remote_datasource.dart';
+import 'package:mobilidade_urbana_app/features/lines/data/data_sources/stop_remote_datasource.dart';
 import 'package:mobilidade_urbana_app/features/lines/data/repository/line_repository_impl.dart';
 import 'package:mobilidade_urbana_app/features/lines/domain/repository/line_repository.dart';
 import 'package:mobilidade_urbana_app/features/lines/domain/usecases/get_lines_usecase.dart';
@@ -71,6 +72,9 @@ Future<void> setupServiceLocator() async {
   // ---- Linhas ----
   sl.registerLazySingleton<LineRemoteDatasource>(
     () => LineRemoteDataSourceImpl(),
+  );
+  sl.registerLazySingleton<StopRemoteDatasource>(
+    () => StopRemoteDatasourceImpl(),
   );
   // LineLocalDatasource mantido para testes manuais
   sl.registerLazySingleton<LineLocalDatasource>(
