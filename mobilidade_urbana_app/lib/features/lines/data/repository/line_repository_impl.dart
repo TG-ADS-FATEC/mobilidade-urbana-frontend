@@ -1,14 +1,16 @@
 import 'package:dio/dio.dart';
 import 'package:mobilidade_urbana_app/core/data_state/data_state.dart';
 import 'package:mobilidade_urbana_app/core/error/failures.dart';
+import 'package:mobilidade_urbana_app/features/lines/data/data_sources/line_local_datasource.dart';
 import 'package:mobilidade_urbana_app/features/lines/data/data_sources/line_remote_datasource.dart';
 import 'package:mobilidade_urbana_app/features/lines/domain/entities/line_entity.dart';
 import 'package:mobilidade_urbana_app/features/lines/domain/repository/line_repository.dart';
 
 class LineRepositoryImpl implements LineRepository {
   final LineRemoteDatasource _remote;
+  final LineLocalDatasource _local;
 
-  LineRepositoryImpl(this._remote);
+  LineRepositoryImpl(this._remote, this._local);
 
   @override
   Future<DataState<({List<LineEntity> items, bool hasNext})>> getLines({int page = 0, int size = 20}) async {
@@ -17,6 +19,26 @@ class LineRepositoryImpl implements LineRepository {
       return DataSuccess((items: result.items, hasNext: result.hasNext));
     } on DioException catch (e) {
       return DataFailed(_failure(e, 'Erro ao carregar linhas'));
+    } catch (e) {
+      return DataFailed(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<DataState<List<LineEntity>>> getMetroLines() async {
+    try {
+      final lines = await _local.getMetroLines();
+      return DataSuccess(lines);
+    } catch (e) {
+      return DataFailed(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<DataState<List<LineEntity>>> getTrainLines() async {
+    try {
+      final lines = await _local.getTrainLines();
+      return DataSuccess(lines);
     } catch (e) {
       return DataFailed(ServerFailure(e.toString()));
     }
