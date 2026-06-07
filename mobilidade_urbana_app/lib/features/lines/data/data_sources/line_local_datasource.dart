@@ -28,6 +28,13 @@ const _metroLines = [
     type: LineType.metro,
     colorValue: 0xFF0455A1,
     agencyId: 'METRO',
+    stops: [
+      'Jabaquara', 'Conceição', 'São Judas', 'Saúde', 'Praça da Árvore',
+      'Santa Cruz', 'Vila Mariana', 'Ana Rosa', 'Paraíso', 'Vergueiro',
+      'São Joaquim', 'Liberdade', 'Sé', 'São Bento', 'Luz', 'Tiradentes',
+      'Armênia', 'Portuguesa-Tietê', 'Carandiru', 'Santana',
+      'Jardim São Paulo-Ayrton Senna', 'Parada Inglesa', 'Tucuruvi',
+    ],
   ),
   LineModel(
     id: 'metro-2',
@@ -36,6 +43,12 @@ const _metroLines = [
     type: LineType.metro,
     colorValue: 0xFF007E5E,
     agencyId: 'METRO',
+    stops: [
+      'Vila Madalena', 'Sumaré', 'Clínicas', 'Consolação', 'Trianon-Masp',
+      'Brigadeiro', 'Paraíso', 'Ana Rosa', 'Chácara Klabin',
+      'Alto do Ipiranga', 'Santos-Imigrantes', 'Sacomã',
+      'Tamanduateí', 'Vila Prudente',
+    ],
   ),
   LineModel(
     id: 'metro-3',
@@ -44,6 +57,13 @@ const _metroLines = [
     type: LineType.metro,
     colorValue: 0xFFEE372F,
     agencyId: 'METRO',
+    stops: [
+      'Palmeiras-Barra Funda', 'Marechal Deodoro', 'Santa Cecília',
+      'República', 'Higienópolis-Mackenzie', 'Anhangabaú', 'Sé',
+      'Pedro II', 'Brás', 'Bresser-Mooca', 'Belém', 'Tatuapé',
+      'Carrão', 'Penha', 'Vila Matilde', 'Guilhermina-Esperança',
+      'Patriarca', 'Artur Alvim', 'Corinthians-Itaquera',
+    ],
   ),
   LineModel(
     id: 'metro-4',
@@ -53,6 +73,11 @@ const _metroLines = [
     colorValue: 0xFFFFD400,
     textColorValue: 0xFF000000,
     agencyId: 'VIAQUATRO',
+    stops: [
+      'Luz', 'República', 'Paulista', 'Fradique Coutinho', 'Faria Lima',
+      'Butantã', 'Pinheiros', 'São Paulo-Morumbi', 'Higienópolis-Mackenzie',
+      'Oscar Freire', 'Consolação', 'Vila Sônia',
+    ],
   ),
   LineModel(
     id: 'metro-5',
@@ -61,6 +86,13 @@ const _metroLines = [
     type: LineType.metro,
     colorValue: 0xFF9B2990,
     agencyId: 'VIAMOBILIDADE',
+    stops: [
+      'Capão Redondo', 'Campo Limpo', 'Vila das Belezas', 'Giovanni Gronchi',
+      'Socorro', 'Borba Gato', 'Adolfo Pinheiro', 'Alto da Boa Vista',
+      'Brooklin', 'Campo Belo', 'Eucaliptos', 'Moema', 'AACD-Servidor',
+      'Hospital São Paulo', 'Santa Cruz', 'Chácara Klabin', 'Largo Treze',
+      'Autódromo', 'Jururatuba', 'Primavera-Interlagos', 'Grajaú',
+    ],
   ),
   LineModel(
     id: 'metro-15',
@@ -69,6 +101,11 @@ const _metroLines = [
     type: LineType.metro,
     colorValue: 0xFF9E9E9E,
     agencyId: 'METRO',
+    stops: [
+      'Vila Prudente', 'Oratório', 'São Lucas', 'Camilo Haddad',
+      'Vila Tolstói', 'Vila União', 'Jardim Planalto', 'Sapopemba',
+      'Fazenda da Juta', 'São Mateus', 'Jd. Colonial',
+    ],
   ),
   LineModel(
     id: 'metro-17',
@@ -77,6 +114,10 @@ const _metroLines = [
     type: LineType.metro,
     colorValue: 0xFFCBA135,
     agencyId: 'METRO',
+    stops: [
+      'Congonhas', 'Câmara Municipal', 'Morumbi', 'Henrique Schaumann',
+      'Jorge João Saad', 'Pacaembu', 'Cidade Jardim', 'Hospital das Clínicas',
+    ],
   ),
 ];
 
@@ -90,6 +131,12 @@ const _trainLines = [
     type: LineType.train,
     colorValue: 0xFFCE1126,
     agencyId: 'TIC_TRENS',
+    stops: [
+      'Luz', 'Palmeiras-Barra Funda', 'Lapa', 'Piqueri', 'Pirituba',
+      'Jaraguá', 'Vila Aurora', 'Perus', 'Caieiras', 'Franco da Rocha',
+      'Baltazar Fidélis', 'Francisco Morato', 'Campo Limpo Paulista',
+      'Várzea Paulista', 'Botujuru', 'Jundiaí',
+    ],
   ),
   LineModel(
     id: 'trem-8',
@@ -98,6 +145,14 @@ const _trainLines = [
     type: LineType.train,
     colorValue: 0xFF97999B,
     agencyId: 'VIAMOBILIDADE',
+    stops: [
+      'Júlio Prestes', 'Palmeiras-Barra Funda', 'Lapa', 'Domingos de Moraes',
+      'Imperatriz Leopoldina', 'Pinheiros', 'Hebraica-Rebouças',
+      'Cidade Jardim', 'Vila Olímpia', 'Berrini', 'Morumbi',
+      'Granja Julieta', 'João Dias', 'Santo Amaro', 'Largo Treze',
+      'Adolfo Pinheiro', 'Alto da Boa Vista', 'Jurubatuba', 'Autódromo',
+      'Primavera-Interlagos', 'Grajaú', 'Mendes-Vila Natal', 'Varginha',
+    ],
   ),
   LineModel(
     id: 'trem-9',
@@ -106,6 +161,13 @@ const _trainLines = [
     type: LineType.train,
     colorValue: 0xFF01A368,
     agencyId: 'VIAMOBILIDADE',
+    stops: [
+      'Osasco', 'Presidente Altino', 'Ceasa', 'Vila Lobos-Jaguaré',
+      'Cidade Universitária', 'Pinheiros', 'Vila Olímpia', 'Berrini',
+      'Morumbi', 'Granja Julieta', 'João Dias', 'Santo Amaro',
+      'Primavera-Interlagos', 'Autódromo', 'Jurubatuba',
+      'Bruno Daniel', 'Santo André',
+    ],
   ),
   LineModel(
     id: 'trem-10',
@@ -114,6 +176,12 @@ const _trainLines = [
     type: LineType.train,
     colorValue: 0xFF00B0C7,
     agencyId: 'CPTM',
+    stops: [
+      'Brás', 'Tatuapé', 'Juventus-Mooca', 'Ipiranga', 'Tamanduateí',
+      'São Caetano do Sul', 'Utinga', 'Santo André', 'Prefeito Saladino',
+      'Capuava', 'Mauá', 'Guapituba', 'Ribeirão Pires',
+      'Rio Grande da Serra',
+    ],
   ),
   LineModel(
     id: 'trem-11',
@@ -122,6 +190,14 @@ const _trainLines = [
     type: LineType.train,
     colorValue: 0xFFF7941D,
     agencyId: 'CPTM',
+    stops: [
+      'Luz', 'Brás', 'Tatuapé', 'Engenheiro Goulart', 'Dom Bosco',
+      'José Bonifácio', 'Ferreira', 'Comendador Ermelino',
+      'São Miguel Paulista', 'Jardim Helena-Vila Mara', 'Itaim Paulista',
+      'Jardim Romano', 'Engenheiro Manoel Feio', 'Braz Cubas', 'Poá',
+      'Calmon Viana', 'Suzano', 'Estudantes', 'Hamamoto',
+      'Mogi das Cruzes',
+    ],
   ),
   LineModel(
     id: 'trem-12',
@@ -130,6 +206,12 @@ const _trainLines = [
     type: LineType.train,
     colorValue: 0xFF113D8B,
     agencyId: 'CPTM',
+    stops: [
+      'Brás', 'Tatuapé', 'Engenheiro Goulart', 'USP Leste',
+      'Comendador Ermelino', 'São Miguel Paulista', 'Jardim Helena-Vila Mara',
+      'Itaim Paulista', 'Jardim Romano', 'Engenheiro Manoel Feio',
+      'Varginha', 'Calmon Viana', 'Suzano', 'Guararema',
+    ],
   ),
   LineModel(
     id: 'trem-13',
@@ -138,5 +220,9 @@ const _trainLines = [
     type: LineType.train,
     colorValue: 0xFF00B398,
     agencyId: 'CPTM',
+    stops: [
+      'Engonhas', 'Guarulhos-Cecap', 'Parada Rodoviária',
+      'Aeroporto-Guarulhos',
+    ],
   ),
 ];
