@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobilidade_urbana_app/features/favorites/presentation/controllers/favorite_controller.dart';
 import 'package:mobilidade_urbana_app/features/lines/domain/entities/line_entity.dart';
 import 'package:mobilidade_urbana_app/features/lines/presentation/controllers/lines_controller.dart';
 import 'package:mobilidade_urbana_app/features/lines/presentation/widgets/line_widgets.dart';
@@ -22,6 +23,7 @@ class _LinesScreenState extends ConsumerState<LinesScreen>
   late final TabController _tabController;
   late final TextEditingController _searchController;
   late final ScrollController _scrollController;
+
   @override
   void initState() {
     super.initState();
@@ -49,14 +51,14 @@ class _LinesScreenState extends ConsumerState<LinesScreen>
     super.dispose();
   }
 
-  List<LineEntity> _filtered(LinesState state, int tabIndex) {
+  List<LineEntity> _filtered(LinesState linesState, int tabIndex, Set<String> favRouteIds) {
     switch (tabIndex) {
-      case 0:  return state.allLines.where((l) => l.isFavorite).toList();
-      case 1:  return state.allLines;
-      case 2:  return state.busLines;
-      case 3:  return state.trainLines;
-      case 4:  return state.metroLines;
-      default: return state.allLines;
+      case 0:  return linesState.allLines.where((l) => favRouteIds.contains(l.id)).toList();
+      case 1:  return linesState.allLines;
+      case 2:  return linesState.busLines;
+      case 3:  return linesState.trainLines;
+      case 4:  return linesState.metroLines;
+      default: return linesState.allLines;
     }
   }
 
@@ -64,6 +66,8 @@ class _LinesScreenState extends ConsumerState<LinesScreen>
   Widget build(BuildContext context) {
     final isDark = THelperFunctions.isDarkMode(context);
     final linesState = ref.watch(linesControllerProvider);
+    final favState = ref.watch(favoriteControllerProvider);
+    final favRouteIds = favState.favorites.map((f) => f.routeId ?? '').toSet();
     final allLines = linesState.allLines;
 
     final hintColor =
@@ -91,7 +95,7 @@ class _LinesScreenState extends ConsumerState<LinesScreen>
                 padding: const EdgeInsets.fromLTRB(
                     TSizes.md, 0, TSizes.md, TSizes.xs),
                 child: SizedBox(
-                  height: 40,
+                  height: 48,
                   child: TextField(
                     controller: _searchController,
                     style: TextStyle(
@@ -163,9 +167,12 @@ class _LinesScreenState extends ConsumerState<LinesScreen>
         _ => TabBarView(
             controller: _tabController,
             children: List.generate(5, (i) {
-              final lines = _filtered(linesState, i);
+              final lines = _filtered(linesState, i, favRouteIds);
 
               if (lines.isEmpty) {
+                if (i == 0) {
+                  return _FavoritesEmptyState(isDark: isDark);
+                }
                 return Center(
                   child: Text(
                     'Nenhuma linha encontrada',
@@ -205,6 +212,46 @@ class _LinesScreenState extends ConsumerState<LinesScreen>
             }),
           ),
       },
+    );
+  }
+}
+
+// ── Empty state de favoritos ──────────────────────────────────────────────────
+
+class _FavoritesEmptyState extends StatelessWidget {
+  final bool isDark;
+  const _FavoritesEmptyState({required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final secondary = isDark ? TColors.darkTextSecondary : TColors.textSecondary;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: TSizes.lg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.star_border_rounded, size: 64, color: secondary),
+            const SizedBox(height: TSizes.sm),
+            Text(
+              'Nenhuma linha favorita',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: TSizes.xs),
+            Text(
+              'Abra uma linha e toque na estrela\npara adicioná-la aos favoritos.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: secondary),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
