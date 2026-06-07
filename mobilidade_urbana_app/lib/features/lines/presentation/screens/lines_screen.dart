@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobilidade_urbana_app/features/lines/domain/entities/line_entity.dart';
 import 'package:mobilidade_urbana_app/features/lines/presentation/controllers/lines_controller.dart';
 import 'package:mobilidade_urbana_app/features/lines/presentation/widgets/line_widgets.dart';
@@ -48,13 +49,14 @@ class _LinesScreenState extends ConsumerState<LinesScreen>
     super.dispose();
   }
 
-  List<LineEntity> _filtered(List<LineEntity> all, int tabIndex) {
+  List<LineEntity> _filtered(LinesState state, int tabIndex) {
     switch (tabIndex) {
-      case 0:  return all.where((l) => l.isFavorite).toList();
-      case 2:  return all.where((l) => l.type == LineType.bus).toList();
-      case 3:  return all.where((l) => l.type == LineType.train).toList();
-      case 4:  return all.where((l) => l.type == LineType.metro).toList();
-      default: return all;
+      case 0:  return state.allLines.where((l) => l.isFavorite).toList();
+      case 1:  return state.allLines;
+      case 2:  return state.busLines;
+      case 3:  return state.trainLines;
+      case 4:  return state.metroLines;
+      default: return state.allLines;
     }
   }
 
@@ -62,7 +64,7 @@ class _LinesScreenState extends ConsumerState<LinesScreen>
   Widget build(BuildContext context) {
     final isDark = THelperFunctions.isDarkMode(context);
     final linesState = ref.watch(linesControllerProvider);
-    final allLines = linesState.lines;
+    final allLines = linesState.allLines;
 
     final hintColor =
         isDark ? TColors.darkTextSecondary : TColors.textSecondary;
@@ -161,7 +163,7 @@ class _LinesScreenState extends ConsumerState<LinesScreen>
         _ => TabBarView(
             controller: _tabController,
             children: List.generate(5, (i) {
-              final lines = _filtered(allLines, i);
+              final lines = _filtered(linesState, i);
 
               if (lines.isEmpty) {
                 return Center(
@@ -193,7 +195,11 @@ class _LinesScreenState extends ConsumerState<LinesScreen>
                       child: Center(child: CircularProgressIndicator()),
                     );
                   }
-                  return LineTile(line: lines[index], isDark: isDark);
+                  return LineTile(
+                    line: lines[index],
+                    isDark: isDark,
+                    onTap: () => context.push('/lines/${lines[index].id}', extra: lines[index]),
+                  );
                 },
               );
             }),
