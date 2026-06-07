@@ -147,11 +147,11 @@ const _trainLines = [
     agencyId: 'VIAMOBILIDADE',
     stops: [
       'Júlio Prestes', 'Palmeiras-Barra Funda', 'Lapa', 'Domingos de Moraes',
-      'Imperatriz Leopoldina', 'Pinheiros', 'Hebraica-Rebouças',
-      'Cidade Jardim', 'Vila Olímpia', 'Berrini', 'Morumbi',
-      'Granja Julieta', 'João Dias', 'Santo Amaro', 'Largo Treze',
-      'Adolfo Pinheiro', 'Alto da Boa Vista', 'Jurubatuba', 'Autódromo',
-      'Primavera-Interlagos', 'Grajaú', 'Mendes-Vila Natal', 'Varginha',
+      'Imperatriz Leopoldina', 'Pres. Altino', 'Osasco',
+      'Comandante Sampaio', 'Quitaúna', 'General Miguel Costa', 'Carapicuíba',
+      'Santa Terezina', 'Antonio João', 'Barueri', 'Jd. Belval', 'Jd. Silveira',
+      'Jandira', 'Sagrado Coração', 'Engº Cardoso', 'Itapevi',
+      'Santa Rita', 'Ambuitá', 'Amador Bueno',
     ],
   ),
   LineModel(
