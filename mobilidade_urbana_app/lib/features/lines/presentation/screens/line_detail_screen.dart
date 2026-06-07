@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobilidade_urbana_app/features/favorites/domain/entities/favorite_entity.dart';
+import 'package:mobilidade_urbana_app/features/favorites/presentation/controllers/favorite_controller.dart';
 import 'package:mobilidade_urbana_app/features/lines/domain/entities/line_entity.dart';
 import 'package:mobilidade_urbana_app/features/lines/domain/entities/stop_entity.dart';
 import 'package:mobilidade_urbana_app/features/lines/presentation/controllers/line_detail_controller.dart';
@@ -16,8 +18,15 @@ class LineDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = THelperFunctions.isDarkMode(context);
     final detailState = ref.watch(lineDetailProvider(line));
+    final favState = ref.watch(favoriteControllerProvider);
     final lineColor = Color(line.colorValue);
     final textColor = Color(line.textColorValue);
+
+    final existingFav = favState.favorites
+        .where((f) => f.routeId == line.id)
+        .firstOrNull;
+    final isFavorited = existingFav != null;
+    final isFavLoading = favState.isLoading;
 
     // Para metrô/trem usa paradas locais; para ônibus usa state da API
     final stops = line.type != LineType.bus
@@ -37,6 +46,28 @@ class LineDetailScreen extends ConsumerWidget {
             pinned: true,
             backgroundColor: lineColor,
             iconTheme: IconThemeData(color: textColor),
+            actions: [
+              isFavLoading
+                  ? Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: textColor,
+                        ),
+                      ),
+                    )
+                  : IconButton(
+                      tooltip: isFavorited ? 'Remover favorito' : 'Favoritar',
+                      icon: Icon(
+                        isFavorited ? Icons.star_rounded : Icons.star_border_rounded,
+                        color: textColor,
+                      ),
+                      onPressed: () => _toggleFavorite(ref, line, existingFav),
+                    ),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 color: lineColor,
@@ -251,6 +282,24 @@ class LineDetailScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _toggleFavorite(WidgetRef ref, LineEntity line, FavoriteEntity? existing) async {
+    final notifier = ref.read(favoriteControllerProvider.notifier);
+    if (existing != null) {
+      await notifier.deleteFavorite(existing.favoriteId!);
+    } else {
+      await notifier.addFavorite(FavoriteEntity(
+        routeId: line.id,
+        favoriteName: line.name,
+        shortName: line.code,
+        routeType: switch (line.type) {
+          LineType.bus   => 'BUS',
+          LineType.metro => 'METRO',
+          LineType.train => 'TRAIN',
+        },
+      ));
+    }
   }
 
   String? _operatorName(String? agencyId) => switch (agencyId) {
