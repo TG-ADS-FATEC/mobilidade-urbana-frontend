@@ -1,5 +1,14 @@
 import 'package:get_it/get_it.dart';
 import 'package:mobilidade_urbana_app/features/favorites/data/data_sources/favorite_remote_datasource.dart';
+import 'package:mobilidade_urbana_app/features/lines/data/data_sources/line_local_datasource.dart';
+import 'package:mobilidade_urbana_app/features/lines/data/data_sources/line_remote_datasource.dart';
+import 'package:mobilidade_urbana_app/features/lines/data/data_sources/stop_remote_datasource.dart';
+import 'package:mobilidade_urbana_app/features/lines/data/repository/line_repository_impl.dart';
+import 'package:mobilidade_urbana_app/features/lines/domain/repository/line_repository.dart';
+import 'package:mobilidade_urbana_app/features/lines/domain/usecases/get_lines_usecase.dart';
+import 'package:mobilidade_urbana_app/features/lines/domain/usecases/get_metro_lines_usecase.dart';
+import 'package:mobilidade_urbana_app/features/lines/domain/usecases/get_train_lines_usecase.dart';
+import 'package:mobilidade_urbana_app/features/lines/domain/usecases/search_lines_usecase.dart';
 import 'package:mobilidade_urbana_app/features/favorites/data/repository/favorite_repository_impl.dart';
 import 'package:mobilidade_urbana_app/features/favorites/domain/repository/favorite_repository.dart';
 import 'package:mobilidade_urbana_app/features/favorites/domain/usecases/add_favorites_usecase.dart';
@@ -58,6 +67,33 @@ Future<void> setupServiceLocator() async {
   );
   sl.registerLazySingleton<SavePreferencesUseCase>(
     () => SavePreferencesUseCase(sl()),
+  );
+
+  // ---- Linhas ----
+  sl.registerLazySingleton<LineRemoteDatasource>(
+    () => LineRemoteDataSourceImpl(),
+  );
+  sl.registerLazySingleton<StopRemoteDatasource>(
+    () => StopRemoteDatasourceImpl(),
+  );
+  // LineLocalDatasource mantido para testes manuais
+  sl.registerLazySingleton<LineLocalDatasource>(
+    () => LineLocalDatasourceImpl(),
+  );
+  sl.registerLazySingleton<LineRepository>(
+    () => LineRepositoryImpl(sl(), sl()),
+  );
+  sl.registerLazySingleton<GetLinesUsecase>(
+    () => GetLinesUsecase(sl()),
+  );
+  sl.registerLazySingleton<GetMetroLinesUsecase>(
+    () => GetMetroLinesUsecase(sl()),
+  );
+  sl.registerLazySingleton<GetTrainLinesUsecase>(
+    () => GetTrainLinesUsecase(sl()),
+  );
+  sl.registerLazySingleton<SearchLinesUsecase>(
+    () => SearchLinesUsecase(sl()),
   );
 
   // ---- Favoritos ----

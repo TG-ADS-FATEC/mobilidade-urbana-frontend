@@ -6,6 +6,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mobilidade_urbana_app/features/favorites/domain/entities/favorite_entity.dart';
 import 'package:mobilidade_urbana_app/features/travel/presentation/controllers/travel_controller.dart';
+import 'package:mobilidade_urbana_app/features/profile/domain/entities/preferences_entity.dart';
+import 'package:mobilidade_urbana_app/features/travel/presentation/widgets/travel_preferences_bottom_sheet.dart';
 import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 
 class TravelScreen extends ConsumerStatefulWidget {
@@ -22,30 +24,45 @@ class _TravelScreenState extends ConsumerState<TravelScreen> {
   final MapController _mapController = MapController();
 
   LatLng? _userLocation;
+  LatLng? _destinationLatLng;
   String? _originAddress;
   String? _destinationAddress;
   bool _locating = false;
+  bool _isLoadingRoute = false;
+  bool _pendingRoute = false;
+  List<LatLng> _routePoints = [];
 
   @override
   void initState() {
     super.initState();
     _loadUserLocation();
     if (widget.destination != null) {
-      _destinationAddress =
-          widget.destination!.address ?? widget.destination!.favoriteName;
+      final addr = widget.destination!.address ?? widget.destination!.favoriteName;
+      _destinationAddress = addr;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final preloaded = ref.read(travelDestinationLatLngProvider);
+        if (preloaded != null) {
+          setState(() => _destinationLatLng = preloaded);
+        } else {
+          _geocodeAddress(addr).then((latLng) {
+            if (mounted) setState(() => _destinationLatLng = latLng);
+          });
+        }
+      });
     }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
   }
 
   void _swapAddresses() {
     setState(() {
-      final tmp = _originAddress;
+      final tmpAddress = _originAddress;
       _originAddress = _destinationAddress;
-      _destinationAddress = tmp;
+      _destinationAddress = tmpAddress;
+
+      final tmpLatLng = _userLocation;
+      _userLocation = _destinationLatLng;
+      _destinationLatLng = tmpLatLng;
+
+      _routePoints = [];
     });
   }
 
@@ -82,6 +99,11 @@ class _TravelScreenState extends ConsumerState<TravelScreen> {
       final address =
           await _reverseGeocode(position.latitude, position.longitude);
       if (mounted) setState(() => _originAddress = address);
+
+      if (_pendingRoute && _destinationLatLng != null) {
+        _pendingRoute = false;
+        _fetchRoute();
+      }
     } catch (_) {
     } finally {
       if (mounted) setState(() => _locating = false);
@@ -123,13 +145,115 @@ class _TravelScreenState extends ConsumerState<TravelScreen> {
     }
   }
 
+  Future<LatLng?> _geocodeAddress(String address) async {
+    try {
+      final response = await Dio().get(
+        'https://nominatim.openstreetmap.org/search',
+        queryParameters: {
+          'q': address,
+          'format': 'json',
+          'limit': 1,
+        },
+        options: Options(
+          headers: {'User-Agent': 'MobilidadeUrbanaApp/1.0'},
+          receiveTimeout: const Duration(seconds: 8),
+        ),
+      );
+
+      final results = response.data as List;
+      if (results.isEmpty) return null;
+
+      final lat = double.parse(results[0]['lat'] as String);
+      final lon = double.parse(results[0]['lon'] as String);
+      return LatLng(lat, lon);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _fetchRoute() async {
+    if (_userLocation == null || _destinationLatLng == null) return;
+
+    setState(() {
+      _isLoadingRoute = true;
+      _routePoints = [];
+    });
+
+    try {
+      final origin = _userLocation!;
+      final dest = _destinationLatLng!;
+
+      final response = await Dio().get(
+        'http://router.project-osrm.org/route/v1/driving/'
+        '${origin.longitude},${origin.latitude};'
+        '${dest.longitude},${dest.latitude}',
+        queryParameters: {
+          'overview': 'full',
+          'geometries': 'geojson',
+        },
+        options: Options(
+          receiveTimeout: const Duration(seconds: 15),
+        ),
+      );
+
+      final routes =
+          (response.data as Map<String, dynamic>)['routes'] as List;
+      if (routes.isEmpty) return;
+
+      final coordinates =
+          routes[0]['geometry']['coordinates'] as List;
+      final points = coordinates
+          .map((c) => LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()))
+          .toList();
+
+      if (!mounted) return;
+      setState(() => _routePoints = points);
+
+      if (points.isNotEmpty) {
+        final bounds = LatLngBounds.fromPoints(points);
+        _mapController.fitCamera(
+          CameraFit.bounds(
+            bounds: bounds,
+            padding: const EdgeInsets.all(60),
+          ),
+        );
+      }
+    } catch (_) {
+    } finally {
+      if (mounted) setState(() => _isLoadingRoute = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ref.listen<FavoriteEntity?>(travelDestinationProvider, (_, next) {
       if (next != null) {
+        final addr = next.address ?? next.favoriteName;
+        final preloaded = ref.read(travelDestinationLatLngProvider);
         setState(() {
-          _destinationAddress = next.address ?? next.favoriteName;
+          _destinationAddress = addr;
+          _routePoints = [];
+          _destinationLatLng = preloaded;
         });
+        if (preloaded != null) {
+          if (_userLocation != null) {
+            _fetchRoute();
+          } else {
+            _pendingRoute = true;
+          }
+        } else {
+          _geocodeAddress(addr).then((latLng) {
+            if (!mounted) return;
+            setState(() => _destinationLatLng = latLng);
+            if (latLng != null) {
+              if (_userLocation != null) {
+                _fetchRoute();
+              } else {
+                _pendingRoute = true;
+              }
+            }
+          });
+        }
       }
     });
 
@@ -153,17 +277,38 @@ class _TravelScreenState extends ConsumerState<TravelScreen> {
                     'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.mobilidade.urbana',
               ),
-              if (_userLocation != null)
-                MarkerLayer(
-                  markers: [
+              if (_routePoints.isNotEmpty)
+                PolylineLayer(
+                  polylines: [
+                    Polyline(
+                      points: _routePoints,
+                      color: Colors.blue.shade600,
+                      strokeWidth: 5,
+                    ),
+                  ],
+                ),
+              MarkerLayer(
+                markers: [
+                  if (_userLocation != null)
                     Marker(
                       point: _userLocation!,
                       width: 28,
                       height: 28,
                       child: const _UserLocationMarker(),
                     ),
-                  ],
-                ),
+                  if (_destinationLatLng != null)
+                    Marker(
+                      point: _destinationLatLng!,
+                      width: 32,
+                      height: 32,
+                      child: const Icon(
+                        Icons.location_on,
+                        color: Colors.red,
+                        size: 32,
+                      ),
+                    ),
+                ],
+              ),
             ],
           ),
 
@@ -191,7 +336,11 @@ class _TravelScreenState extends ConsumerState<TravelScreen> {
               originAddress: _originAddress,
               destinationAddress: _destinationAddress,
               locating: _locating,
+              isLoadingRoute: _isLoadingRoute,
+              canFindRoute: _userLocation != null && _destinationLatLng != null,
               onSwap: _swapAddresses,
+              onFindRoute: _fetchRoute,
+              onPreferences: () => showTravelPreferencesSheet(context),
             ),
           ),
         ],
@@ -292,13 +441,21 @@ class _RoutePanel extends StatelessWidget {
   final String? originAddress;
   final String? destinationAddress;
   final bool locating;
+  final bool isLoadingRoute;
+  final bool canFindRoute;
   final VoidCallback onSwap;
+  final VoidCallback onFindRoute;
+  final VoidCallback onPreferences;
 
   const _RoutePanel({
     required this.originAddress,
     required this.destinationAddress,
     required this.locating,
+    required this.isLoadingRoute,
+    required this.canFindRoute,
     required this.onSwap,
+    required this.onFindRoute,
+    required this.onPreferences,
   });
 
   @override
@@ -347,7 +504,7 @@ class _RoutePanel extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                _PreferencesButton(isDark: isDark),
+                _PreferencesButton(isDark: isDark, onTap: onPreferences),
                 const SizedBox(height: 16),
                 _SearchCard(
                   isDark: isDark,
@@ -357,7 +514,11 @@ class _RoutePanel extends StatelessWidget {
                   onSwap: onSwap,
                 ),
                 const SizedBox(height: 16),
-                const _FindButton(),
+                _FindButton(
+                  loading: isLoadingRoute,
+                  enabled: canFindRoute,
+                  onPressed: onFindRoute,
+                ),
               ],
             ),
           ),
@@ -367,37 +528,49 @@ class _RoutePanel extends StatelessWidget {
   }
 }
 
-class _PreferencesButton extends StatelessWidget {
+class _PreferencesButton extends ConsumerWidget {
   final bool isDark;
-  const _PreferencesButton({required this.isDark});
+  final VoidCallback onTap;
+  const _PreferencesButton({required this.isDark, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.15)
-              : Colors.black.withValues(alpha: 0.15),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final prefs = ref.watch(travelPreferencesProvider);
+
+    final labels = {
+      RoutePreference.fastest: 'Mais rápida',
+      RoutePreference.fewerTransfers: 'Menos trocas',
+      RoutePreference.leastWalking: 'Caminhar menos',
+    };
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.15)
+                : Colors.black.withValues(alpha: 0.15),
+          ),
+          borderRadius: BorderRadius.circular(12),
         ),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Preferências de trajeto',
-            style: TextStyle(
-              fontSize: 15,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              labels[prefs.routePreference] ?? 'Preferências de trajeto',
+              style: TextStyle(
+                fontSize: 15,
+                color: isDark ? TColors.darkTextSecondary : TColors.textSecondary,
+              ),
+            ),
+            Icon(
+              Icons.keyboard_arrow_down,
               color: isDark ? TColors.darkTextSecondary : TColors.textSecondary,
             ),
-          ),
-          Icon(
-            Icons.keyboard_arrow_down,
-            color: isDark ? TColors.darkTextSecondary : TColors.textSecondary,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -597,7 +770,15 @@ class _DestinationField extends StatelessWidget {
 }
 
 class _FindButton extends StatelessWidget {
-  const _FindButton();
+  final bool loading;
+  final bool enabled;
+  final VoidCallback onPressed;
+
+  const _FindButton({
+    required this.loading,
+    required this.enabled,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -605,20 +786,31 @@ class _FindButton extends StatelessWidget {
       width: double.infinity,
       height: 56,
       child: ElevatedButton.icon(
-        icon: const Icon(Icons.search, size: 20),
-        label: const Text(
-          'Encontrar seu caminho',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        icon: loading
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.black54,
+                ),
+              )
+            : const Icon(Icons.search, size: 20),
+        label: Text(
+          loading ? 'Calculando rota...' : 'Encontrar seu caminho',
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: TColors.soothingLime,
           foregroundColor: TColors.textPrimary,
+          disabledBackgroundColor: TColors.soothingLime.withValues(alpha: 0.5),
+          disabledForegroundColor: TColors.textPrimary.withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           elevation: 0,
         ),
-        onPressed: () {},
+        onPressed: (loading || !enabled) ? null : onPressed,
       ),
     );
   }

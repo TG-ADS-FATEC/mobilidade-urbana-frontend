@@ -1,6 +1,8 @@
 import 'package:go_router/go_router.dart';
 import 'package:mobilidade_urbana_app/features/favorites/presentation/screens/favorites_screen.dart';
 import 'package:mobilidade_urbana_app/features/home/presentation/screens/home_screen.dart';
+import 'package:mobilidade_urbana_app/features/lines/domain/entities/line_entity.dart';
+import 'package:mobilidade_urbana_app/features/lines/presentation/screens/line_detail_screen.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:mobilidade_urbana_app/features/onboarding/presentation/screens/success_screen.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/screens/edit_profile_screen.dart';
@@ -39,6 +41,13 @@ class AppRouter {
           GoRoute(
             path: '/favorites',
             builder: (context, state) => const FavoritesScreen(),
+          ),
+          GoRoute(
+            path: '/lines/:id',
+            builder: (context, state) {
+              final line = state.extra as LineEntity;
+              return LineDetailScreen(line: line);
+            },
           ),
         ],
       );
