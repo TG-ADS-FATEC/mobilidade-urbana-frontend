@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mobilidade_urbana_app/features/favorites/domain/entities/favorite_entity.dart';
 import 'package:mobilidade_urbana_app/features/favorites/presentation/controllers/favorite_controller.dart';
 import 'package:mobilidade_urbana_app/features/lines/domain/entities/line_entity.dart';
 import 'package:mobilidade_urbana_app/features/lines/presentation/controllers/lines_controller.dart';
@@ -23,6 +24,10 @@ class _LinesScreenState extends ConsumerState<LinesScreen>
   late final TabController _tabController;
   late final TextEditingController _searchController;
   late final ScrollController _scrollController;
+
+  /// Cache acumulativo: preserva linhas já vistas mesmo após
+  /// a busca ser limpa ou a página mudar.
+  final Map<String, LineEntity> _lineCache = {};
 
   @override
   void initState() {
@@ -51,9 +56,46 @@ class _LinesScreenState extends ConsumerState<LinesScreen>
     super.dispose();
   }
 
-  List<LineEntity> _filtered(LinesState linesState, int tabIndex, Set<String> favRouteIds) {
+  /// Converte um FavoriteEntity em LineEntity com cores reais.
+  /// Ordem de prioridade:
+  ///   1. Cache acumulativo (linhas já vistas nesta sessão)
+  ///   2. allLines atual (busca/página em memória)
+  ///   3. Fallback por tipo de transporte
+  LineEntity _favToLine(FavoriteEntity fav, List<LineEntity> allLines) {
+    if (fav.routeId != null) {
+      final cached = _lineCache[fav.routeId!];
+      if (cached != null) return cached;
+    }
+    final found = allLines.where((l) => l.id == fav.routeId).firstOrNull;
+    if (found != null) return found;
+
+    final type = switch (fav.routeType?.toUpperCase()) {
+      'METRO' => LineType.metro,
+      'TRAIN' => LineType.train,
+      _       => LineType.bus,
+    };
+    final color = switch (type) {
+      LineType.metro => 0xFF1565C0,   // azul
+      LineType.train => 0xFF6A1B9A,   // roxo
+      LineType.bus   => 0xFF2E7D32,   // verde
+    };
+    return LineEntity(
+      id: fav.routeId,
+      code: fav.shortName ?? fav.favoriteName,
+      name: fav.favoriteName,
+      type: type,
+      colorValue: color,
+      textColorValue: 0xFFFFFFFF,
+    );
+  }
+
+  List<LineEntity> _filtered(
+    LinesState linesState,
+    int tabIndex,
+    List<FavoriteEntity> favorites,
+  ) {
     switch (tabIndex) {
-      case 0:  return linesState.allLines.where((l) => favRouteIds.contains(l.id)).toList();
+      case 0:  return favorites.map((f) => _favToLine(f, linesState.allLines)).toList();
       case 1:  return linesState.allLines;
       case 2:  return linesState.busLines;
       case 3:  return linesState.trainLines;
@@ -67,8 +109,12 @@ class _LinesScreenState extends ConsumerState<LinesScreen>
     final isDark = THelperFunctions.isDarkMode(context);
     final linesState = ref.watch(linesControllerProvider);
     final favState = ref.watch(favoriteControllerProvider);
-    final favRouteIds = favState.favorites.map((f) => f.routeId ?? '').toSet();
     final allLines = linesState.allLines;
+
+    // Acumula linhas no cache para preservar cores mesmo após busca/paginação.
+    for (final line in allLines) {
+      if (line.id != null) _lineCache[line.id!] = line;
+    }
 
     final hintColor =
         isDark ? TColors.darkTextSecondary : TColors.textSecondary;
@@ -167,7 +213,7 @@ class _LinesScreenState extends ConsumerState<LinesScreen>
         _ => TabBarView(
             controller: _tabController,
             children: List.generate(5, (i) {
-              final lines = _filtered(linesState, i, favRouteIds);
+              final lines = _filtered(linesState, i, favState.favorites);
 
               if (lines.isEmpty) {
                 if (i == 0) {
