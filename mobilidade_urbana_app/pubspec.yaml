@@ -58,5 +58,6 @@ flutter:
     - .env
     - assets/icon/icon.png
     - assets/images/bus.svg
+    - assets/images/suporte.png
     - assets/logos/
     - assets/images/avatars/
