@@ -18,13 +18,13 @@ class PreferencesRemoteDatasourceImpl implements PreferencesRemoteDatasource {
 
   @override
   Future<PreferencesModel> getPreferences() async {
-    final response = await _dio.get('/preferences/me');
+    final response = await _dio.get('/preferences');
     return PreferencesModel.fromJson(response.data);
   }
 
   @override
   Future<PreferencesModel> updatePreferences(Map<String, dynamic> data) async {
-    final response = await _dio.put('/preferences/me', data: data);
+    final response = await _dio.put('/preferences', data: data);
     return PreferencesModel.fromJson(response.data);
 
   }
@@ -37,7 +37,7 @@ class PreferencesRemoteDatasourceImpl implements PreferencesRemoteDatasource {
 
   @override
   Future<void> deletePreferences() async {
-    await _dio.delete('/preferences/me');
+    await _dio.delete('/preferences');
   }
 
 
