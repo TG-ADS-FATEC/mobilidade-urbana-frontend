@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobilidade_urbana_app/core/widgets/confirm_dialog.dart';
 import 'package:mobilidade_urbana_app/features/profile/presentation/controllers/profile_controller.dart';
@@ -13,11 +14,15 @@ import 'package:mobilidade_urbana_app/features/profile/presentation/widgets/sett
 import 'package:mobilidade_urbana_app/core/widgets/section_heading.dart';
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
 
+final _monitoringEnabledProvider = StateProvider<bool>((ref) => true);
+
 class ProfileShortcuts extends ConsumerWidget {
   const ProfileShortcuts({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final monitoringEnabled = ref.watch(_monitoringEnabledProvider);
+
     ref.listen(
       profileControllerProvider.select((s) => s.navigateToWelcome),
       (prev, next) {
@@ -90,8 +95,19 @@ class ProfileShortcuts extends ConsumerWidget {
                 icon: Icons.analytics_outlined,
                 title: 'Permitir monitoramento',
                 subtitle: 'Coleta para melhorias',
-                onTap: () {},
-                trailing: Switch(value: true, onChanged: (value) {}),
+                onTap: () => ref
+                    .read(_monitoringEnabledProvider.notifier)
+                    .state = !monitoringEnabled,
+                trailing: Switch(
+                  value: monitoringEnabled,
+                  onChanged: (value) => ref
+                      .read(_monitoringEnabledProvider.notifier)
+                      .state = value,
+                  activeColor: TColors.primary,
+                  thumbColor: WidgetStateProperty.resolveWith(
+                    (states) => states.contains(WidgetState.selected) ? Colors.white : null,
+                  ),
+                ),
               ),
               TSettingsMenuTile(
                 icon: Icons.insert_drive_file_outlined,
