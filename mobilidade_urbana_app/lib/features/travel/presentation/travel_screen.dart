@@ -257,6 +257,11 @@ class _TravelScreenState extends ConsumerState<TravelScreen> {
       }
     });
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final tileUrl = isDark
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
+        : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png';
+
     return Scaffold(
       body: Stack(
         children: [
@@ -273,8 +278,7 @@ class _TravelScreenState extends ConsumerState<TravelScreen> {
             ),
             children: [
               TileLayer(
-                urlTemplate:
-                    'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                urlTemplate: tileUrl,
                 userAgentPackageName: 'com.mobilidade.urbana',
               ),
               if (_routePoints.isNotEmpty)

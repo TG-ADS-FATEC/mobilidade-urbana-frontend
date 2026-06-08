@@ -6,6 +6,8 @@ class StopEntity extends Equatable {
   final String? description;
   final double? latitude;
   final double? longitude;
+  final int? sequence;
+  final String? arrivalTime;
 
   const StopEntity({
     required this.id,
@@ -13,8 +15,10 @@ class StopEntity extends Equatable {
     this.description,
     this.latitude,
     this.longitude,
+    this.sequence,
+    this.arrivalTime,
   });
 
   @override
-  List<Object?> get props => [id, name, description, latitude, longitude];
+  List<Object?> get props => [id, name, description, latitude, longitude, sequence, arrivalTime];
 }

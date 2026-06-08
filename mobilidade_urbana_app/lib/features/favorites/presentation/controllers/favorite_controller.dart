@@ -27,15 +27,19 @@ class FavoriteState {
     this.usageCounts = const {},
   });
 
+  static const _unset = Object();
+
   FavoriteState copyWith({
     bool? isLoading,
-    String? errorMessage,
+    Object? errorMessage = _unset,
     List<FavoriteEntity>? favorites,
     Map<String, int>? usageCounts,
   }) {
     return FavoriteState(
       isLoading: isLoading ?? this.isLoading,
-      errorMessage: errorMessage ?? this.errorMessage,
+      errorMessage: identical(errorMessage, _unset)
+          ? this.errorMessage
+          : errorMessage as String?,
       favorites: favorites ?? this.favorites,
       usageCounts: usageCounts ?? this.usageCounts,
     );
@@ -135,19 +139,20 @@ class FavoriteNotifier extends Notifier<FavoriteState> {
     final result = await _addFavoritesUsecase(favorite);
     switch (result) {
       case DataSuccess(:final data):
-        var entityToAdd = data;
-        if (favorite.address != null && data.favoriteId != null) {
+        // A API pode não devolver todos os campos no POST response.
+        // Preservamos os campos enviados como fallback.
+        if (data.favoriteId != null && favorite.address != null) {
           await _saveLocalAddress(data.favoriteId!, favorite.address!);
-          entityToAdd = FavoriteEntity(
-            favoriteId: data.favoriteId,
-            favoriteName: data.favoriteName,
-            shortName: data.shortName,
-            routeType: data.routeType,
-            routeId: data.routeId,
-            createdAt: data.createdAt,
-            address: favorite.address,
-          );
         }
+        final entityToAdd = FavoriteEntity(
+          favoriteId: data.favoriteId,
+          favoriteName: data.favoriteName.isNotEmpty ? data.favoriteName : favorite.favoriteName,
+          shortName: data.shortName ?? favorite.shortName,
+          routeType: data.routeType ?? favorite.routeType,
+          routeId: data.routeId ?? favorite.routeId,
+          createdAt: data.createdAt,
+          address: favorite.address,
+        );
         state = state.copyWith(isLoading: false, favorites: [...state.favorites, entityToAdd]);
         return true;
       case DataFailed(:final failure):

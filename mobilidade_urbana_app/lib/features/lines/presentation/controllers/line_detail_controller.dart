@@ -5,25 +5,44 @@ import 'package:mobilidade_urbana_app/features/lines/domain/entities/line_entity
 import 'package:mobilidade_urbana_app/features/lines/domain/entities/stop_entity.dart';
 
 class LineDetailState {
+  /// Todos os trips do itinerário (cada trip = uma lista de paradas).
+  final List<List<StopEntity>> trips;
+
+  /// Índice do trip atualmente exibido.
+  final int selectedTrip;
+
   final bool isLoading;
   final String? errorMessage;
-  final List<StopEntity> stops;
 
   const LineDetailState({
+    this.trips = const [],
+    this.selectedTrip = 0,
     this.isLoading = false,
     this.errorMessage,
-    this.stops = const [],
   });
 
+  /// Paradas do trip selecionado.
+  List<StopEntity> get stops =>
+      trips.isNotEmpty ? trips[selectedTrip] : const [];
+
+  /// Há mais de um sentido disponível.
+  bool get hasMultipleDirections => trips.length > 1;
+
+  static const _unset = Object();
+
   LineDetailState copyWith({
+    List<List<StopEntity>>? trips,
+    int? selectedTrip,
     bool? isLoading,
-    String? errorMessage,
-    List<StopEntity>? stops,
+    Object? errorMessage = _unset,
   }) =>
       LineDetailState(
+        trips: trips ?? this.trips,
+        selectedTrip: selectedTrip ?? this.selectedTrip,
         isLoading: isLoading ?? this.isLoading,
-        errorMessage: errorMessage ?? this.errorMessage,
-        stops: stops ?? this.stops,
+        errorMessage: identical(errorMessage, _unset)
+            ? this.errorMessage
+            : errorMessage as String?,
       );
 }
 
@@ -32,26 +51,31 @@ class LineDetailNotifier extends FamilyNotifier<LineDetailState, LineEntity> {
 
   @override
   LineDetailState build(LineEntity line) {
-    // Metrô e trem já têm paradas locais — não precisa buscar na API.
     if (line.type != LineType.bus) return const LineDetailState();
 
     _datasource = sl<StopRemoteDatasource>();
-    Future.microtask(_loadStops);
+    Future.microtask(_loadItinerary);
     return const LineDetailState(isLoading: true);
   }
 
-  Future<void> _loadStops() async {
+  Future<void> _loadItinerary() async {
     final routeId = arg.id;
     if (routeId == null) {
       state = state.copyWith(isLoading: false, errorMessage: 'ID da linha não encontrado');
       return;
     }
     try {
-      final stops = await _datasource.getStopsByRoute(routeId);
-      state = state.copyWith(isLoading: false, stops: stops);
+      final trips = await _datasource.getItinerary(routeId);
+      state = state.copyWith(isLoading: false, trips: trips, errorMessage: null);
     } catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }
+  }
+
+  void switchDirection() {
+    if (!state.hasMultipleDirections) return;
+    final next = (state.selectedTrip + 1) % state.trips.length;
+    state = state.copyWith(selectedTrip: next);
   }
 }
 

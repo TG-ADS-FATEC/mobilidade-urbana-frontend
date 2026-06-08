@@ -9,8 +9,11 @@ import 'package:mobilidade_urbana_app/features/lines/domain/usecases/get_lines_u
 import 'package:mobilidade_urbana_app/features/lines/domain/usecases/get_metro_lines_usecase.dart';
 import 'package:mobilidade_urbana_app/features/lines/domain/usecases/get_train_lines_usecase.dart';
 import 'package:mobilidade_urbana_app/features/lines/domain/usecases/search_lines_usecase.dart';
+import 'package:mobilidade_urbana_app/features/favorites/data/data_sources/trip_favorite_remote_datasource.dart';
 import 'package:mobilidade_urbana_app/features/favorites/data/repository/favorite_repository_impl.dart';
+import 'package:mobilidade_urbana_app/features/favorites/data/repository/trip_favorite_repository_impl.dart';
 import 'package:mobilidade_urbana_app/features/favorites/domain/repository/favorite_repository.dart';
+import 'package:mobilidade_urbana_app/features/favorites/domain/repository/trip_favorite_repository.dart';
 import 'package:mobilidade_urbana_app/features/favorites/domain/usecases/add_favorites_usecase.dart';
 import 'package:mobilidade_urbana_app/features/favorites/domain/usecases/delete_favorite_usecase.dart';
 import 'package:mobilidade_urbana_app/features/favorites/domain/usecases/get_favorites_usecase.dart';
@@ -96,12 +99,20 @@ Future<void> setupServiceLocator() async {
     () => SearchLinesUsecase(sl()),
   );
 
-  // ---- Favoritos ----
+  // ---- Favoritos (rotas) ----
   sl.registerLazySingleton<FavoriteRemoteDatasource>(
       () => FavoriteRemoteDataSourceImpl(),
   );
   sl.registerLazySingleton<FavoriteRepository>(
         () => FavoriteRepositoryImpl(sl()),
+  );
+
+  // ---- Favoritos (trips) ----
+  sl.registerLazySingleton<TripFavoriteRemoteDatasource>(
+      () => TripFavoriteRemoteDatasourceImpl(),
+  );
+  sl.registerLazySingleton<TripFavoriteRepository>(
+      () => TripFavoriteRepositoryImpl(sl()),
   );
   sl.registerLazySingleton<GetFavoritesUsecase>(
         () => GetFavoritesUsecase(sl()),
