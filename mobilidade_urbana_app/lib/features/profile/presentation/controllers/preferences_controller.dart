@@ -45,7 +45,7 @@ class PreferencesNotifier extends Notifier<PreferencesState> {
     _updatePreferencesUsecase = sl<UpdatePreferencesUsecase>();
     _savePreferencesUseCase = sl<SavePreferencesUseCase>();
     loadPreferences();
-    return const PreferencesState();
+    return const PreferencesState(isLoading: true);
   }
 
   Future<void> loadPreferences() async {
