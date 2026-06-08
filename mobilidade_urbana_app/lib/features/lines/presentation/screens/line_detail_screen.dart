@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobilidade_urbana_app/features/favorites/domain/entities/favorite_entity.dart';
@@ -9,13 +11,116 @@ import 'package:mobilidade_urbana_app/utils/constants/colors.dart';
 import 'package:mobilidade_urbana_app/utils/constants/sizes.dart';
 import 'package:mobilidade_urbana_app/utils/helpers/helper_functions.dart';
 
-class LineDetailScreen extends ConsumerWidget {
+class LineDetailScreen extends ConsumerStatefulWidget {
   final LineEntity line;
 
   const LineDetailScreen({super.key, required this.line});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LineDetailScreen> createState() => _LineDetailScreenState();
+}
+
+class _LineDetailScreenState extends ConsumerState<LineDetailScreen> {
+  LineEntity get line => widget.line;
+
+  Future<void> _toggleFavorite(FavoriteEntity? existing) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final notifier = ref.read(favoriteControllerProvider.notifier);
+    final removing = existing != null;
+
+    if (removing) {
+      await notifier.deleteFavorite(existing.favoriteId!);
+    } else {
+      await notifier.addFavorite(FavoriteEntity(
+        routeId: line.id,
+        favoriteName: line.name,
+        shortName: line.code,
+        routeType: switch (line.type) {
+          LineType.bus   => 'BUS',
+          LineType.metro => 'METRO',
+          LineType.train => 'TRAIN',
+        },
+      ));
+    }
+
+    if (!mounted) return;
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgSuccess = isDark ? const Color(0xFF2C2C2C) : TColors.dark;
+    const contentColor = TColors.white;
+
+    final error = ref.read(favoriteControllerProvider).errorMessage;
+    if (error != null) {
+      messenger.showSnackBar(SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error_outline, color: contentColor, size: 18),
+            const SizedBox(width: TSizes.xs),
+            Expanded(
+              child: Text(error, style: const TextStyle(color: contentColor)),
+            ),
+          ],
+        ),
+        backgroundColor: TColors.error,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(TSizes.sm),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(TSizes.borderRadiusLg),
+        ),
+      ));
+      return;
+    }
+
+    messenger.clearSnackBars();
+    messenger.showSnackBar(SnackBar(
+      content: Row(
+        children: [
+          Icon(
+            removing ? Icons.star_border_rounded : Icons.star_rounded,
+            color: removing ? Colors.grey[400] : TColors.soothingLime,
+            size: 18,
+          ),
+          const SizedBox(width: TSizes.xs),
+          Expanded(
+            child: Text(
+              removing
+                  ? '${line.code} removida dos favoritos'
+                  : '${line.code} adicionada aos favoritos',
+              style: const TextStyle(color: contentColor),
+            ),
+          ),
+        ],
+      ),
+      backgroundColor: bgSuccess,
+      behavior: SnackBarBehavior.floating,
+      margin: const EdgeInsets.all(TSizes.sm),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(TSizes.borderRadiusLg),
+      ),
+      duration: const Duration(seconds: 3),
+      action: removing
+          ? SnackBarAction(
+              label: 'Desfazer',
+              textColor: TColors.soothingLime,
+              onPressed: () async {
+                await notifier.addFavorite(FavoriteEntity(
+                  routeId: line.id,
+                  favoriteName: line.name,
+                  shortName: line.code,
+                  routeType: switch (line.type) {
+                    LineType.bus   => 'BUS',
+                    LineType.metro => 'METRO',
+                    LineType.train => 'TRAIN',
+                  },
+                ));
+              },
+            )
+          : null,
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final isDark = THelperFunctions.isDarkMode(context);
     final detailState = ref.watch(lineDetailProvider(line));
     final favState = ref.watch(favoriteControllerProvider);
@@ -28,10 +133,10 @@ class LineDetailScreen extends ConsumerWidget {
     final isFavorited = existingFav != null;
     final isFavLoading = favState.isLoading;
 
-    // Para metrô/trem usa paradas locais; para ônibus usa state da API
+    // Para metrô/trem usa paradas locais; para ônibus usa o trip selecionado da API.
     final stops = line.type != LineType.bus
         ? (line.stops ?? []).map((name) => StopEntity(id: name, name: name)).toList()
-        : detailState.stops;
+        : detailState.stops; // getter já retorna trips[selectedTrip]
 
     final operatorLabel = _operatorName(line.agencyId);
     final typeLabel = _typeLabel(line.type);
@@ -47,6 +152,13 @@ class LineDetailScreen extends ConsumerWidget {
             backgroundColor: lineColor,
             iconTheme: IconThemeData(color: textColor),
             actions: [
+              if (detailState.hasMultipleDirections)
+                IconButton(
+                  tooltip: 'Trocar sentido',
+                  icon: Icon(Icons.swap_horiz_rounded, color: textColor),
+                  onPressed: () =>
+                      ref.read(lineDetailProvider(line).notifier).switchDirection(),
+                ),
               isFavLoading
                   ? Padding(
                       padding: const EdgeInsets.all(14),
@@ -65,7 +177,7 @@ class LineDetailScreen extends ConsumerWidget {
                         isFavorited ? Icons.star_rounded : Icons.star_border_rounded,
                         color: textColor,
                       ),
-                      onPressed: () => _toggleFavorite(ref, line, existingFav),
+                      onPressed: () => _toggleFavorite(existingFav),
                     ),
             ],
             flexibleSpace: FlexibleSpaceBar(
@@ -251,7 +363,7 @@ class LineDetailScreen extends ConsumerWidget {
                                         ),
                                   ),
                                   if (stop.description != null) ...[
-                                    const SizedBox(height: 2),
+                                    const SizedBox(height: TSizes.xxs),
                                     Text(
                                       stop.description!,
                                       style: Theme.of(context)
@@ -261,6 +373,21 @@ class LineDetailScreen extends ConsumerWidget {
                                             color: isDark
                                                 ? TColors.darkTextSecondary
                                                 : TColors.textSecondary,
+                                          ),
+                                    ),
+                                  ],
+                                  if (stop.arrivalTime != null && (isFirst || isLast)) ...[
+                                    const SizedBox(height: TSizes.xxs),
+                                    Text(
+                                      stop.arrivalTime!,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: isDark
+                                                ? TColors.darkTextSecondary
+                                                : TColors.textSecondary,
+                                            fontFeatures: [const FontFeature.tabularFigures()],
                                           ),
                                     ),
                                   ],
@@ -282,24 +409,6 @@ class LineDetailScreen extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  Future<void> _toggleFavorite(WidgetRef ref, LineEntity line, FavoriteEntity? existing) async {
-    final notifier = ref.read(favoriteControllerProvider.notifier);
-    if (existing != null) {
-      await notifier.deleteFavorite(existing.favoriteId!);
-    } else {
-      await notifier.addFavorite(FavoriteEntity(
-        routeId: line.id,
-        favoriteName: line.name,
-        shortName: line.code,
-        routeType: switch (line.type) {
-          LineType.bus   => 'BUS',
-          LineType.metro => 'METRO',
-          LineType.train => 'TRAIN',
-        },
-      ));
-    }
   }
 
   String? _operatorName(String? agencyId) => switch (agencyId) {
